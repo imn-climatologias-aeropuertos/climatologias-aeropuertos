@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+version = "0.0.0"
+description = "A simple tool for extract and visualize data from international airports of Costa Rica."
+
+[packages]
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+ipython = "*"
+notebook = "*"
+jupyter = "*"
+jupyterlab = "*"
+click = "*"
+
+[dev-packages]
+black = "==20.8b1"
+isort = "*"
+pytest = "*"
+bump2version = "*"
+
+[requires]
+python_version = "3.6"
