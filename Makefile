@@ -1,3 +1,5 @@
+STATION=mrpv
+
 SOURCE_FILES=$(shell find . -path "./clima/*.py")
 TEST_FILES=$(shell find . -path "./test/*.py")
 SOURCES_FOLDER=clima
@@ -38,3 +40,6 @@ lint:
 
 tests:
 	PYTHONPATH=. $(POETRY_RUN) pytest -vv test
+
+run:
+	python -m clima resume-table $(STATION)
