@@ -1,4 +1,4 @@
-STATION=mrpv
+STATION=mroc
 
 SOURCE_FILES=$(shell find . -path "./clima/*.py")
 TEST_FILES=$(shell find . -path "./test/*.py")
