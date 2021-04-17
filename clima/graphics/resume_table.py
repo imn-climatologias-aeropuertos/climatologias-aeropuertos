@@ -1,11 +1,15 @@
+from decimal import ROUND_HALF_UP, Decimal
+
 import pandas as pd
-from decimal import Decimal, ROUND_HALF_UP
+
 from ..logger_model import logger
+
 
 def _days_of_month(max_days: int):
     return [f"{day}" for day in range(1, max_days + 1)]
 
-_days = {
+
+_days_per_month = {
     1: _days_of_month(31),
     2: _days_of_month(28),
     3: _days_of_month(31),
@@ -20,38 +24,157 @@ _days = {
     12: _days_of_month(31),
 }
 
+
 def _handle_precipitation(df: pd.DataFrame):
     data = []
     total_prec_days = 0
-    total_prec = 0
-    
+    total_prec = 0.0
+
     for i in range(1, 13):
         data_per_month = []
         month = df.query(f"Mes == {i}")
-        
+
         # Fill the NaN values by the mean if the mean is >= 0.1 else 0.0
-        for day in _days[i]:
+        for day in _days_per_month[i]:
             mean_prec = month[day].mean()
             month[day] = month[day].fillna(mean_prec if mean_prec >= 0.1 else 0.0)
-        
+
         # Obtain the precipitation sum for every row (month by year) and its mean
         logger.info(f"Obtaining precipitation sum for month: {i}")
-        month["sum"] = month[_days[i]].sum(axis=1)
-        mean_prec = float(Decimal(month["sum"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP))
+        month["sum"] = month[_days_per_month[i]].sum(axis=1)
+        mean_prec = float(
+            Decimal(month["sum"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
+        )
         data_per_month.append(mean_prec)
         total_prec += mean_prec
-        
+
         # Obtain the days with precipitation registered and its mean
         logger.info(f"Obtaining days with precipitation for month: {i}")
-        month['days with prec'] = (month[_days[i]] != 0.0).T.sum()
-        mean_days_with_prec = int(Decimal(month["days with prec"].mean()).quantize(Decimal("1."), ROUND_HALF_UP))
+        month["days with prec"] = (month[_days_per_month[i]] != 0.0).T.sum()
+        mean_days_with_prec = int(
+            Decimal(month["days with prec"].mean()).quantize(
+                Decimal("1."), ROUND_HALF_UP
+            )
+        )
         data_per_month.append(mean_days_with_prec)
         total_prec_days += mean_days_with_prec
 
         data.append(data_per_month)
-    
+
     data.append([round(total_prec, 1), total_prec_days])
     return data
+
+
+def _handle_tmax(df: pd.DataFrame):
+    data = []
+    extreme_tmax = 0.0
+    mean_tmax = 0.0
+
+    for i in range(1, 13):
+        data_per_month = []
+        month = df.query(f"Mes == {i}")
+
+        # Fill the NaN values by the mean
+        for day in _days_per_month[i]:
+            day_mean = month[day].mean()
+            month[day] = month[day].fillna(day_mean)
+
+        # Obtain the tmax extreme and mean per every month (same month) by year
+        month["tmax"] = month[_days_per_month[i]].max(axis=1)
+        mean_tmax_of_month = float(
+            Decimal(month["tmax"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
+        )
+        extreme_tmax_of_month = float(
+            Decimal(month["tmax"].max()).quantize(Decimal(".1"), ROUND_HALF_UP)
+        )
+
+        data_per_month.append(extreme_tmax_of_month)
+        data_per_month.append(mean_tmax_of_month)
+
+        if extreme_tmax_of_month > extreme_tmax:
+            extreme_tmax = extreme_tmax_of_month
+        mean_tmax += mean_tmax_of_month
+
+        data.append(data_per_month)
+
+    data.append(
+        [
+            extreme_tmax,
+            float(Decimal(mean_tmax / 12).quantize(Decimal(".1"), ROUND_HALF_UP)),
+        ]
+    )
+
+    return data
+
+
+def _handle_tmin(df: pd.DataFrame):
+    data = []
+    extreme_tmin = 100.0
+    mean_tmin = 0.0
+
+    for i in range(1, 13):
+        data_per_month = []
+        month = df.query(f"Mes == {i}")
+
+        # Fill the NaN values by the mean
+        for day in _days_per_month[i]:
+            day_mean = month[day].mean()
+            month[day] = month[day].fillna(day_mean)
+
+        # Obtain the tmin extreme and mean per every month (same month) by year
+        month["tmin"] = month[_days_per_month[i]].min(axis=1)
+        mean_tmin_of_month = float(
+            Decimal(month["tmin"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
+        )
+        extreme_tmin_of_month = float(
+            Decimal(month["tmin"].min()).quantize(Decimal(".1"), ROUND_HALF_UP)
+        )
+
+        data_per_month.append(extreme_tmin_of_month)
+        data_per_month.append(mean_tmin_of_month)
+
+        if extreme_tmin_of_month < extreme_tmin:
+            extreme_tmin = extreme_tmin_of_month
+        mean_tmin += mean_tmin_of_month
+
+        data.append(data_per_month)
+
+    data.append(
+        [
+            extreme_tmin,
+            float(Decimal(mean_tmin / 12).quantize(Decimal(".1"), ROUND_HALF_UP)),
+        ]
+    )
+
+    return data
+
+
+latex_header = """
+\\begin{table}[htb]
+\caption{Resumen de variables meteorológicas, \icaoCode{} \yearsRange{}.}
+\label{table:resumen}
+\\begin{center}
+\\begin{tabular}{>{\centering}p{0.12\\textwidth}>
+{\centering}p{0.1\\textwidth}>
+{\centering}p{0.1\\textwidth}>
+{\centering}p{0.1\\textwidth}>
+{\centering}p{0.1\\textwidth}>
+{\centering}p{0.1\\textwidth}>
+{\centering\\arraybackslash}p{0.1\\textwidth}}
+\headrow
+\\textbf{Mes} & \\textbf{Temperatura máxima extrema (°C)} & \\textbf{Temperatura mínima extrema (°C)} & \\textbf{Temperatura máxima media (°C)} & \\textbf{Temperatura mínima media (°C)} & \\textbf{Precipitación total media (mm)} & \\textbf{Media de días con precipitación}\\\\
+"""
+
+latex_footer = """
+\hline  % Please only put a hline at the end of the table
+\end{tabular}
+\end{center}
+
+\\begin{tablenotes}
+\item \\textbf{Palabras clave:} \\airportName{}, cambio de viento, cimatología aeronáutica, mínimos operativos, variables meteorológicas.
+\end{tablenotes}
+\end{table}
+"""
 
 
 def generate_table(station: str):
@@ -60,7 +183,47 @@ def generate_table(station: str):
     prec = pd.read_csv(f"data/{station}/{station}_prec.csv")
     tmax = pd.read_csv(f"data/{station}/{station}_max.csv")
     tmin = pd.read_csv(f"data/{station}/{station}_min.csv")
-    
+
     prec_data = _handle_precipitation(prec)
-    # _handle_precipitation(tmax)
-    # _handle_precipitation(tmin)
+    tmax_data = _handle_tmax(tmax)
+    tmin_data = _handle_tmin(tmin)
+
+    months = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Setiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre",
+        "Anual",
+    ]
+    data = []
+    latex_table = ""
+    for m, tx, tn, pcp in zip(months, tmax_data, tmin_data, prec_data):
+        month_data = [
+            m,
+            str(tx[0]),
+            str(tn[0]),
+            str(tx[1]),
+            str(tn[1]),
+            str(pcp[0]),
+            str(pcp[1]),
+        ]
+
+        data.append(month_data)
+
+    for month_data in data[:-1]:
+        latex_table += " & ".join(month_data) + "\\\\\n"
+    latex_table += "\\textbf{" + "} & \\textbf{".join(data[-1]) + "}\\\\\n"
+
+    f = open("template/Tables/table01.tex", "w")
+    f.write(latex_header)
+    f.write(latex_table)
+    f.write(latex_footer)
+    f.close()

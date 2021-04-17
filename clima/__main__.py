@@ -3,6 +3,9 @@ import click
 from . import __version__
 from .graphics.resume_table import generate_table
 
+f = open("logging.log", "w")
+f.close()
+
 
 @click.group()
 def cli():

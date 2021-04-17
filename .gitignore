@@ -1,7 +1,8 @@
 ### LaTeX ###
 
-# template folder and compressed files
+# template and trash folder and compressed files
 template/
+trash/
 *.rar
 *.zip
 
