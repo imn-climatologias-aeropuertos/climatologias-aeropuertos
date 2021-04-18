@@ -1,6 +1,9 @@
 from decimal import ROUND_HALF_UP, Decimal
 
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from ..logger_model import logger
 
@@ -9,7 +12,7 @@ def _days_of_month(max_days: int):
     return [f"{day}" for day in range(1, max_days + 1)]
 
 
-_days_per_month = {
+_DAYS_PER_MONTH = {
     1: _days_of_month(31),
     2: _days_of_month(28),
     3: _days_of_month(31),
@@ -35,13 +38,13 @@ def _handle_precipitation(df: pd.DataFrame):
         month = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean if the mean is >= 0.1 else 0.0
-        for day in _days_per_month[i]:
+        for day in _DAYS_PER_MONTH[i]:
             mean_prec = month[day].mean()
             month[day] = month[day].fillna(mean_prec if mean_prec >= 0.1 else 0.0)
 
         # Obtain the precipitation sum for every row (month by year) and its mean
         logger.info(f"Obtaining precipitation sum for month: {i}")
-        month["sum"] = month[_days_per_month[i]].sum(axis=1)
+        month["sum"] = month[_DAYS_PER_MONTH[i]].sum(axis=1)
         mean_prec = float(
             Decimal(month["sum"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
@@ -50,7 +53,7 @@ def _handle_precipitation(df: pd.DataFrame):
 
         # Obtain the days with precipitation registered and its mean
         logger.info(f"Obtaining days with precipitation for month: {i}")
-        month["days with prec"] = (month[_days_per_month[i]] != 0.0).T.sum()
+        month["days with prec"] = (month[_DAYS_PER_MONTH[i]] != 0.0).T.sum()
         mean_days_with_prec = int(
             Decimal(month["days with prec"].mean()).quantize(
                 Decimal("1."), ROUND_HALF_UP
@@ -75,12 +78,12 @@ def _handle_tmax(df: pd.DataFrame):
         month = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean
-        for day in _days_per_month[i]:
+        for day in _DAYS_PER_MONTH[i]:
             day_mean = month[day].mean()
             month[day] = month[day].fillna(day_mean)
 
         # Obtain the tmax extreme and mean per every month (same month) by year
-        month["tmax"] = month[_days_per_month[i]].max(axis=1)
+        month["tmax"] = month[_DAYS_PER_MONTH[i]].max(axis=1)
         mean_tmax_of_month = float(
             Decimal(month["tmax"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
@@ -117,12 +120,12 @@ def _handle_tmin(df: pd.DataFrame):
         month = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean
-        for day in _days_per_month[i]:
+        for day in _DAYS_PER_MONTH[i]:
             day_mean = month[day].mean()
             month[day] = month[day].fillna(day_mean)
 
         # Obtain the tmin extreme and mean per every month (same month) by year
-        month["tmin"] = month[_days_per_month[i]].min(axis=1)
+        month["tmin"] = month[_DAYS_PER_MONTH[i]].min(axis=1)
         mean_tmin_of_month = float(
             Decimal(month["tmin"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
@@ -149,7 +152,39 @@ def _handle_tmin(df: pd.DataFrame):
     return data
 
 
-latex_header = """
+def _generate_climogram(station: str, data: list):
+    df = pd.DataFrame(np.array(data), columns=["Mes", "Tmax_extrema", "Tmin_extrema", "Tmax_media", "Tmin_media", "Precipitacion", "Dias_con_pcp"])
+    
+    df["Tmax_extrema"] = df["Tmax_extrema"].astype(float)
+    df["Tmin_extrema"] = df["Tmin_extrema"].astype(float)
+    df["Tmax_media"] = df["Tmax_media"].astype(float)
+    df["Tmin_media"] = df["Tmin_media"].astype(float)
+    df["Precipitacion"] = df["Precipitacion"].astype(float)
+    df["Dias_con_pcp"] = df["Dias_con_pcp"].astype(int)
+    
+    sns.set()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars = sns.barplot(x="Mes", y="Precipitacion", data=df, color="royalblue", ax=ax, label="Precipitación")
+    ax.set(ylabel="Precipitación (mm)")
+    ax.set_xlabel(None)
+    ax_hanldes, ax_labels = ax.get_legend_handles_labels()
+    #ax.legend(loc="upper left")
+    ax2 = ax.twinx()
+    ax2.set(ylabel="Temperatura (°C)", ylim=(int(df["Tmin_media"].min()-3), int(df["Tmax_media"].max())+3))
+    ax2.grid(False)
+    sns.set_style("ticks")
+    tmax = sns.lineplot(x="Mes", y="Tmax_media", data=df, color="red", ax=ax2, lw=5, label="Temperatura máxima")
+    tmin = sns.lineplot(x="Mes", y="Tmin_media", data=df, color="blue", ax=ax2, lw=5, label="Temperatura mínima")
+    ax2_hanldes, ax2_labels = ax2.get_legend_handles_labels()
+    all_handles = ax_hanldes + ax2_hanldes
+    ax.set_xticklabels([lab[:3].upper() for lab in df["Mes"].tolist()])
+    sns.set()
+    ax2.legend(handles=all_handles, loc="upper left", framealpha=0.9)
+    #ax.tick_params(axis='y')
+    fig.savefig(f"template/Figures/graphs/climograma.png", format="png", dpi=600)
+
+
+LATEX_HEADER = """
 \\begin{table}[htb]
 \caption{Resumen de variables meteorológicas, \icaoCode{} \yearsRange{}.}
 \label{table:resumen}
@@ -165,7 +200,7 @@ latex_header = """
 \\textbf{Mes} & \\textbf{Temperatura máxima extrema (°C)} & \\textbf{Temperatura mínima extrema (°C)} & \\textbf{Temperatura máxima media (°C)} & \\textbf{Temperatura mínima media (°C)} & \\textbf{Precipitación total media (mm)} & \\textbf{Media de días con precipitación}\\\\
 """
 
-latex_footer = """
+LATEX_FOOTER = """
 \hline  % Please only put a hline at the end of the table
 \end{tabular}
 \end{center}
@@ -223,7 +258,9 @@ def generate_table(station: str):
     latex_table += "\\textbf{" + "} & \\textbf{".join(data[-1]) + "}\\\\\n"
 
     f = open("template/Tables/table01.tex", "w")
-    f.write(latex_header)
+    f.write(LATEX_HEADER)
     f.write(latex_table)
-    f.write(latex_footer)
+    f.write(LATEX_FOOTER)
     f.close()
+    
+    _generate_climogram(station, data[:-1])
