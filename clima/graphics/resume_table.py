@@ -1,11 +1,13 @@
 from decimal import ROUND_HALF_UP, Decimal
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
 
-from ..logger_model import logger
+from clima.graphics import months
+
+from clima.logger_model import logger
 
 
 def _days_of_month(max_days: int):
@@ -153,35 +155,72 @@ def _handle_tmin(df: pd.DataFrame):
 
 
 def _generate_climogram(station: str, data: list):
-    df = pd.DataFrame(np.array(data), columns=["Mes", "Tmax_extrema", "Tmin_extrema", "Tmax_media", "Tmin_media", "Precipitacion", "Dias_con_pcp"])
-    
+    df = pd.DataFrame(
+        np.array(data),
+        columns=[
+            "Mes",
+            "Tmax_extrema",
+            "Tmin_extrema",
+            "Tmax_media",
+            "Tmin_media",
+            "Precipitacion",
+            "Dias_con_pcp",
+        ],
+    )
+
     df["Tmax_extrema"] = df["Tmax_extrema"].astype(float)
     df["Tmin_extrema"] = df["Tmin_extrema"].astype(float)
     df["Tmax_media"] = df["Tmax_media"].astype(float)
     df["Tmin_media"] = df["Tmin_media"].astype(float)
     df["Precipitacion"] = df["Precipitacion"].astype(float)
     df["Dias_con_pcp"] = df["Dias_con_pcp"].astype(int)
-    
+
     sns.set()
     fig, ax = plt.subplots(figsize=(10, 6))
-    bars = sns.barplot(x="Mes", y="Precipitacion", data=df, color="royalblue", ax=ax, label="Precipitación")
+    bars = sns.barplot(
+        x="Mes",
+        y="Precipitacion",
+        data=df,
+        color="royalblue",
+        ax=ax,
+        label="Precipitación",
+    )
     ax.set(ylabel="Precipitación (mm)")
     ax.set_xlabel(None)
     ax_hanldes, ax_labels = ax.get_legend_handles_labels()
-    #ax.legend(loc="upper left")
+    # ax.legend(loc="upper left")
     ax2 = ax.twinx()
-    ax2.set(ylabel="Temperatura (°C)", ylim=(int(df["Tmin_media"].min()-3), int(df["Tmax_media"].max())+3))
+    ax2.set(
+        ylabel="Temperatura (°C)",
+        ylim=(int(df["Tmin_media"].min() - 3), int(df["Tmax_media"].max()) + 3),
+    )
     ax2.grid(False)
     sns.set_style("ticks")
-    tmax = sns.lineplot(x="Mes", y="Tmax_media", data=df, color="red", ax=ax2, lw=5, label="Temperatura máxima")
-    tmin = sns.lineplot(x="Mes", y="Tmin_media", data=df, color="blue", ax=ax2, lw=5, label="Temperatura mínima")
+    tmax = sns.lineplot(
+        x="Mes",
+        y="Tmax_media",
+        data=df,
+        color="red",
+        ax=ax2,
+        lw=5,
+        label="Temperatura máxima",
+    )
+    tmin = sns.lineplot(
+        x="Mes",
+        y="Tmin_media",
+        data=df,
+        color="blue",
+        ax=ax2,
+        lw=5,
+        label="Temperatura mínima",
+    )
     ax2_hanldes, ax2_labels = ax2.get_legend_handles_labels()
     all_handles = ax_hanldes + ax2_hanldes
     ax.set_xticklabels([lab[:3].upper() for lab in df["Mes"].tolist()])
     sns.set()
     ax2.legend(handles=all_handles, loc="upper left", framealpha=0.9)
-    #ax.tick_params(axis='y')
-    fig.savefig(f"template/Figures/graphs/climograma.png", format="png", dpi=600)
+    # ax.tick_params(axis='y')
+    fig.savefig("template/Figures/graphs/climograma.png", format="png", dpi=600)
 
 
 LATEX_HEADER = """
@@ -223,21 +262,6 @@ def generate_table(station: str):
     tmax_data = _handle_tmax(tmax)
     tmin_data = _handle_tmin(tmin)
 
-    months = [
-        "Enero",
-        "Febrero",
-        "Marzo",
-        "Abril",
-        "Mayo",
-        "Junio",
-        "Julio",
-        "Agosto",
-        "Setiembre",
-        "Octubre",
-        "Noviembre",
-        "Diciembre",
-        "Anual",
-    ]
     data = []
     latex_table = ""
     for m, tx, tn, pcp in zip(months, tmax_data, tmin_data, prec_data):
@@ -262,5 +286,5 @@ def generate_table(station: str):
     f.write(latex_table)
     f.write(LATEX_FOOTER)
     f.close()
-    
+
     _generate_climogram(station, data[:-1])

@@ -43,3 +43,4 @@ tests:
 
 run:
 	python -m clima resume-table $(STATION)
+	python -m clima wind-direction $(STATION)
