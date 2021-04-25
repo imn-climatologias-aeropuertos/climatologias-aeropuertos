@@ -6,8 +6,9 @@ import pandas as pd
 import seaborn as sns
 
 from clima.graphics import months
-
 from clima.logger_model import logger
+
+months.append("Anual")
 
 
 def _days_of_month(max_days: int):
