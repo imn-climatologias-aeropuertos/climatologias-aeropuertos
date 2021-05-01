@@ -5,30 +5,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from clima.graphics import months
+from clima.graphics import DAYS_PER_MONTH
+from clima.graphics import MONTHS as months
 from clima.logger_model import logger
 
-months.append("Anual")
-
-
-def _days_of_month(max_days: int):
-    return [f"{day}" for day in range(1, max_days + 1)]
-
-
-_DAYS_PER_MONTH = {
-    1: _days_of_month(31),
-    2: _days_of_month(28),
-    3: _days_of_month(31),
-    4: _days_of_month(30),
-    5: _days_of_month(31),
-    6: _days_of_month(30),
-    7: _days_of_month(31),
-    8: _days_of_month(31),
-    9: _days_of_month(30),
-    10: _days_of_month(31),
-    11: _days_of_month(30),
-    12: _days_of_month(31),
-}
+local_months = months.copy()
+local_months.append("Anual")
 
 
 def _handle_precipitation(df: pd.DataFrame):
@@ -41,13 +23,13 @@ def _handle_precipitation(df: pd.DataFrame):
         month = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean if the mean is >= 0.1 else 0.0
-        for day in _DAYS_PER_MONTH[i]:
+        for day in DAYS_PER_MONTH[i]:
             mean_prec = month[day].mean()
             month[day] = month[day].fillna(mean_prec if mean_prec >= 0.1 else 0.0)
 
         # Obtain the precipitation sum for every row (month by year) and its mean
         logger.info(f"Obtaining precipitation sum for month: {i}")
-        month["sum"] = month[_DAYS_PER_MONTH[i]].sum(axis=1)
+        month["sum"] = month[DAYS_PER_MONTH[i]].sum(axis=1)
         mean_prec = float(
             Decimal(month["sum"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
@@ -56,7 +38,7 @@ def _handle_precipitation(df: pd.DataFrame):
 
         # Obtain the days with precipitation registered and its mean
         logger.info(f"Obtaining days with precipitation for month: {i}")
-        month["days with prec"] = (month[_DAYS_PER_MONTH[i]] != 0.0).T.sum()
+        month["days with prec"] = (month[DAYS_PER_MONTH[i]] != 0.0).T.sum()
         mean_days_with_prec = int(
             Decimal(month["days with prec"].mean()).quantize(
                 Decimal("1."), ROUND_HALF_UP
@@ -81,12 +63,12 @@ def _handle_tmax(df: pd.DataFrame):
         month = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean
-        for day in _DAYS_PER_MONTH[i]:
+        for day in DAYS_PER_MONTH[i]:
             day_mean = month[day].mean()
             month[day] = month[day].fillna(day_mean)
 
         # Obtain the tmax extreme and mean per every month (same month) by year
-        month["tmax"] = month[_DAYS_PER_MONTH[i]].max(axis=1)
+        month["tmax"] = month[DAYS_PER_MONTH[i]].max(axis=1)
         mean_tmax_of_month = float(
             Decimal(month["tmax"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
@@ -123,12 +105,12 @@ def _handle_tmin(df: pd.DataFrame):
         month = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean
-        for day in _DAYS_PER_MONTH[i]:
+        for day in DAYS_PER_MONTH[i]:
             day_mean = month[day].mean()
             month[day] = month[day].fillna(day_mean)
 
         # Obtain the tmin extreme and mean per every month (same month) by year
-        month["tmin"] = month[_DAYS_PER_MONTH[i]].min(axis=1)
+        month["tmin"] = month[DAYS_PER_MONTH[i]].min(axis=1)
         mean_tmin_of_month = float(
             Decimal(month["tmin"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
@@ -265,7 +247,7 @@ def generate_table(station: str):
 
     data = []
     latex_table = ""
-    for m, tx, tn, pcp in zip(months, tmax_data, tmin_data, prec_data):
+    for m, tx, tn, pcp in zip(local_months, tmax_data, tmin_data, prec_data):
         month_data = [
             m,
             str(tx[0]),
