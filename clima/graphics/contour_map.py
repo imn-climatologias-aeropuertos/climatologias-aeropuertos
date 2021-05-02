@@ -28,10 +28,11 @@ def contour_map(
         hours_array = np.array([hours.index(x) + 1 for x in hours])
     else:
         hours_array = np.array([hours.index(x) + 6 for x in hours])
-    # plt.yticks(hours_array.tolist(), local_time_list(hours))
 
     # Get the month df
-    logger.info("Getting the monthly DataFrames.")
+    logger.info(
+        f"Getting the monthly DataFrames for contour map, variable: {variable}."
+    )
     for month in months:
         month_i = months.index(month) + 1
         month_means = []
@@ -56,10 +57,6 @@ def contour_map(
             month_means.append(day_means)
 
         month_means_array = np.array(month_means)
-        # if station == "mroc":
-        #     hours_array = np.array([hours.index(x) + 1 for x in hours])
-        # else:
-        #     hours_array = np.array([hours.index(x) + 6 for x in hours])
         days_array = np.array(list(map(int, DAYS_PER_MONTH[month_i])))
 
         logger.info(
@@ -70,18 +67,20 @@ def contour_map(
         # plt.yticks(hours_array.tolist(), local_time_list(hours))
         im = axs[month_i - 1].contourf(X, Y, Z, cmap=cmap, vmax=v_max, vmin=v_min)
         axs[month_i - 1].set_yticks(list(hours_array))
-        
+
         # yticklabels hidden for more right plots
         if month_i in [1, 4, 7, 10]:
             axs[month_i - 1].set_yticklabels(local_time_list(hours))
         else:
             axs[month_i - 1].set_yticklabels([])
-        
+
         # set the title for every plot (the month name)
         axs[month_i - 1].set_title(month, weight="bold", size=16)
 
     cbar_ax = fig.add_axes([0.85, 0.25, 0.02, 0.5])
-    bounds = list(map(int, np.linspace(int(v_min), int(v_max), cbar_ticks_num).tolist()))
+    bounds = list(
+        map(int, np.linspace(int(v_min), int(v_max), cbar_ticks_num).tolist())
+    )
     norm = mpl.colors.BoundaryNorm(bounds, cmap.N, extend="both")
     cb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cbar_ax)
     cb.set_label(label=cbar_label, size=20)
