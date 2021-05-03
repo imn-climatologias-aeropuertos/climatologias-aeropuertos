@@ -4,7 +4,7 @@ import pandas as pd
 from . import __version__
 from .graphics.contour_map import contour_map
 from .graphics.resume_table import generate_table
-from .graphics.time_series import time_series
+from .graphics.time_series import single_time_series, time_series
 from .graphics.wind_direction import heat_map
 
 f = open("logging.log", "w")
@@ -37,25 +37,27 @@ def wind_direction(station: str):
     data = pd.read_csv(f"data/{station}/{station}_metars.csv")
     df = data[columns]
     df["Hour1_24"] = df["Hour"].replace(0, 24)
+    label = "Dirección del viento (°)"
 
-    heat_map(df, station)
-    contour_map(
-        df,
-        station,
-        columns[-1],
-        v_max=260,
-        v_min=60,
-        cbar_label="Dirección del viento (°)",
-        save_as=columns[-1].lower(),
-    )
-    time_series(
-        df,
-        station,
-        columns[-1],
-        v_min=50,
-        yaxis_label="Dirección del viento (°)",
-        save_as=columns[-1].lower(),
-    )
+    # heat_map(df, station)
+    # contour_map(
+    #     df,
+    #     station,
+    #     columns[-1],
+    #     v_max=260,
+    #     v_min=60,
+    #     cbar_label=label,
+    #     save_as=columns[-1].lower(),
+    # )
+    # time_series(
+    #     df,
+    #     station,
+    #     columns[-1],
+    #     v_min=50,
+    #     yaxis_label=label,
+    #     save_as=columns[-1].lower(),
+    # )
+    single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
 
 
 @cli.command()

@@ -115,3 +115,27 @@ def time_series(
     fig.savefig(
         f"template/Figures/graphs/time_series_{save_as}.png", format="png", dpi=300
     )
+
+
+def single_time_series(df: pd.DataFrame, variable: str, yaxis_label="", save_as=""):
+
+    month_means = np.zeros(12)
+    logger.info(f"Extracting data for single time series (monthly) for {variable}.")
+    for i in range(12):
+        j = i + 1
+        month_df = df.query(f"Month == {j}")
+        month_means[i] = month_df[variable].mean()
+
+    sns.set()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    im = sns.lineplot(x=range(12), y=month_means, ax=ax)
+    im.set_xticks(list(range(12)))
+    im.set_xticklabels([m[0:3].upper() for m in months])
+    im.set_ylabel(yaxis_label)
+
+    logger.info(f"Saving single time series figure for variable {variable}.")
+    fig.savefig(
+        f"template/Figures/graphs/single_time_series_{save_as}.png",
+        format="png",
+        dpi=300,
+    )
