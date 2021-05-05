@@ -1,0 +1,123 @@
+###################################
+# Config data for the plots of MROC
+###################################
+mroc:
+  wind_direction:
+    contour_map:
+      min: 60
+      max: 260
+      ticks_num: 9
+    time_series:
+      min: 50
+      max: 300
+      tick_jump: 50
+      hline:
+        - 5
+        - 6
+        - 8
+        - 9
+        - 10
+
+  wind_speed:
+    contour_map:
+      min: 2
+      max: 18
+      ticks_num: 10
+    time_series:
+      min: 0
+      max: 15
+      tick_jump: 3
+      hline:
+        - 
+
+###################################
+# Config data for the plots of MRLB
+###################################
+mrlb:
+  wind_direction:
+    contour_map:
+      min: 60
+      max: 260
+      ticks_num: 9
+    time_series:
+      min: 50
+      max: 300
+      tick_jump: 50
+      hline:
+        - 5
+        - 6
+        - 8
+        - 9
+        - 10
+
+  wind_speed:
+    contour_map:
+      min: 4
+      max: 20
+      ticks_num: 9
+    time_series:
+      min: 0
+      max: 20
+      tick_jump: 4
+      hline:
+        -
+
+###################################
+# Config data for the plots of MRLM
+###################################
+mrlm:
+  wind_direction:
+    contour_map:
+      min: 60
+      max: 260
+      ticks_num: 9
+    time_series:
+      min: 50
+      max: 300
+      tick_jump: 50
+      hline:
+        - 
+
+  wind_speed:
+    contour_map:
+      min: 0
+      max: 14
+      ticks_num: 8
+    time_series:
+      min: 0
+      max: 12
+      tick_jump: 2
+      hline:
+        - 
+
+###################################
+# Config data for the plots of MRPV
+###################################
+mrpv:
+  wind_direction:
+    contour_map:
+      min: 60
+      max: 260
+      ticks_num: 9
+    time_series:
+      min: 50
+      max: 300
+      tick_jump: 50
+      hline:
+        - 5
+        - 6
+        - 8
+        - 9
+        - 10
+
+  wind_speed:
+    contour_map:
+      min: 2
+      max: 20
+      ticks_num: 11
+    time_series:
+      min: 2
+      max: 18
+      tick_jump: 2
+      hline:
+        - 

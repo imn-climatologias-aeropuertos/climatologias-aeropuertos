@@ -24,12 +24,9 @@ def time_series(
     df: pd.DataFrame,
     station: str,
     variable: str,
-    v_min=0,
-    v_max=260,
-    ytick_jump=50,
     yaxis_label="",
-    hline=(5, 6, 8, 9, 10),
     save_as="",
+    config={"min": 0, "max": 260, "tick_jump": 50, "hline": [5, 6, 8, 9, 10]},
 ):
     sns.set()
     fig, _axs = plt.subplots(figsize=(16, 18), nrows=4, ncols=3)
@@ -77,9 +74,9 @@ def time_series(
             y="var",
             data=month_df,
             ax=axs[month_i - 1],
-            hue_norm=(v_min, v_max),
+            hue_norm=(config["min"], config["max"]),
         )
-        if month_i in hline:
+        if month_i in config["hline"]:
             axs[ax_i].plot(
                 list(hours_array),
                 [180 for x in range(len(hours_array))],
@@ -91,7 +88,9 @@ def time_series(
         axs[ax_i].set_xticks(reduce_list(list(hours_array)))
         axs[ax_i].set_xlabel("")
         axs[ax_i].set_ylabel(yaxis_label, size=16)
-        axs[ax_i].set_yticks([x for x in range(v_min, v_max, ytick_jump)])
+        axs[ax_i].set_yticks(
+            [x for x in range(config["min"], config["max"], config["tick_jump"])]
+        )
 
         if month_i in [2, 3, 5, 6, 8, 9, 11, 12]:
             axs[ax_i].set_yticklabels([])

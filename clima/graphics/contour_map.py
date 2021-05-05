@@ -13,11 +13,9 @@ def contour_map(
     df: pd.DataFrame,
     station: str,
     variable: str,
-    v_max=100,
-    v_min=0,
-    cbar_ticks_num=9,
     cbar_label="",
     save_as="",
+    config={"max": 100, "min": 0, "ticks_num": 9},
 ):
     fig, _axs = plt.subplots(figsize=(16, 18), nrows=4, ncols=3)
     axs = _axs.flatten()
@@ -65,7 +63,7 @@ def contour_map(
         X, Y = np.meshgrid(days_array, hours_array)
         Z = month_means_array.T
         # plt.yticks(hours_array.tolist(), local_time_list(hours))
-        im = axs[month_i - 1].contourf(X, Y, Z, cmap=cmap, vmax=v_max, vmin=v_min)
+        im = axs[month_i - 1].contourf(X, Y, Z, cmap=cmap, vmax=config["max"], vmin=config["min"])
         axs[month_i - 1].set_yticks(list(hours_array))
 
         # yticklabels hidden for more right plots
@@ -79,7 +77,9 @@ def contour_map(
 
     cbar_ax = fig.add_axes([0.85, 0.25, 0.02, 0.5])
     bounds = list(
-        map(int, np.linspace(int(v_min), int(v_max), cbar_ticks_num).tolist())
+        map(
+            int, np.linspace(config["min"], config["max"], config["ticks_num"]).tolist()
+        )
     )
     norm = mpl.colors.BoundaryNorm(bounds, cmap.N, extend="both")
     cb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cbar_ax)
