@@ -24,8 +24,8 @@ mroc:
       max: 18
       ticks_num: 10
     time_series:
-      min: 0
-      max: 15
+      min: 3
+      max: 21
       tick_jump: 3
       hline:
         - 
@@ -116,8 +116,8 @@ mrpv:
       max: 20
       ticks_num: 11
     time_series:
-      min: 2
-      max: 18
-      tick_jump: 2
+      min: 3
+      max: 21
+      tick_jump: 3
       hline:
         - 

@@ -63,7 +63,9 @@ def contour_map(
         X, Y = np.meshgrid(days_array, hours_array)
         Z = month_means_array.T
         # plt.yticks(hours_array.tolist(), local_time_list(hours))
-        im = axs[month_i - 1].contourf(X, Y, Z, cmap=cmap, vmax=config["max"], vmin=config["min"])
+        im = axs[month_i - 1].contourf(
+            X, Y, Z, cmap=cmap, vmax=config["max"], vmin=config["min"]
+        )
         axs[month_i - 1].set_yticks(list(hours_array))
 
         # yticklabels hidden for more right plots
