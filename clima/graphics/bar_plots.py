@@ -209,12 +209,15 @@ def all_weather_bar_plot(df: pd.DataFrame, station: str):
     means_ra = np.arange(12)
     means_sh = np.arange(12)
     means_ts = np.arange(12)
+    means_fg = np.arange(12)
+    means_br = np.arange(12)
     years = df["Year"].unique()
 
     logger.info(f"Getting the monthly DataFrames for all-weather bar plot.")
     for i, month in enumerate(MONTHS):
         month_df = df.query(f"Month == {i + 1}")
-        means = np.zeros(4)
+        means_prec = np.zeros(4)
+        means_obsc = np.zeros(2)
         
         logger.info(f"Getting the yearly DataFrames for all-weather bar plot, month: {month}.")
         for year in years:
@@ -224,32 +227,55 @@ def all_weather_bar_plot(df: pd.DataFrame, station: str):
             for day in DAYS_PER_MONTH[i + 1]:
                 day_df = year_df.query(f"Day == {day}")
                 
-                means[0] += _handle_weather(day_df, "Weather_precipitation", "DZ")
-                means[1] += _handle_weather(day_df, "Weather_precipitation", "RA")
-                means[2] += _handle_weather(day_df, "Weather_description", "SH")
-                means[3] += _handle_weather(day_df, "Weather_description", "TS")
+                means_prec[0] += _handle_weather(day_df, "Weather_precipitation", "DZ")
+                means_prec[1] += _handle_weather(day_df, "Weather_precipitation", "RA")
+                means_prec[2] += _handle_weather(day_df, "Weather_description", "SH")
+                means_prec[3] += _handle_weather(day_df, "Weather_description", "TS")
+                
+                means_obsc[0] += _handle_weather(day_df, "Weather_obscuration", "FG")
+                means_obsc[1] += _handle_weather(day_df, "Weather_obscuration", "BR")
             
-        means_dz[i] = Decimal(means[0] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
-        means_ra[i] = Decimal(means[1] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
-        means_sh[i] = Decimal(means[2] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
-        means_ts[i] = Decimal(means[3] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        means_dz[i] = Decimal(means_prec[0] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        means_ra[i] = Decimal(means_prec[1] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        means_sh[i] = Decimal(means_prec[2] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        means_ts[i] = Decimal(means_prec[3] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        
+        means_fg[i] = Decimal(means_obsc[0] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        means_br[i] = Decimal(means_obsc[1] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
     
     months_abbr = [m[0:3].upper() for m in MONTHS]
-    means_per_month = []
+    means_prec_per_month = []
+    means_obsc_per_month = []
     
-    logger.info(f"Creating DataFrame for all weather bar plots.")
+    logger.info(f"Creating DataFrame for all weather bar plots: precipitations.")
     for arr, weather in zip([means_dz, means_ra, means_sh, means_ts], ["DZ", "RA", "SHRA", "TS ó TSRA"]):
         for i, m in enumerate(months_abbr):
             row = [m, arr[i], weather]
-            means_per_month.append(row)
+            means_prec_per_month.append(row)
     
-    means_df = pd.DataFrame(means_per_month, columns=["month", "mean", "weather"])
+    means_prec_df = pd.DataFrame(means_prec_per_month, columns=["month", "mean", "weather"])
+    
+    logger.info(f"Creating DataFrame for all weather bar plots: obscurations.")
+    for arr, weather in zip([means_fg, means_br], ["FG ó BCFG", "BR"]):
+        for i, m in enumerate(months_abbr):
+            row = [m, arr[i], weather]
+            means_obsc_per_month.append(row)
+    
+    means_obsc_df = pd.DataFrame(means_obsc_per_month, columns=["month", "mean", "weather"])
     
     sns.set()
-    g = sns.catplot(x="month", y="mean", hue="weather", data=means_df, kind="bar", legend_out=False, height=6, aspect=10/6, palette="rainbow")
+    g = sns.catplot(x="month", y="mean", hue="weather", data=means_prec_df, kind="bar", legend_out=False, height=6, aspect=10/6, palette="rainbow")
     plt.xlabel("")
     plt.ylabel("Número de ocurrencias", fontsize=14)
     plt.legend(framealpha=0.6)
     
-    logger.info(f"Saving bar plot figure for variable for all weather.")
-    plt.savefig(f"template/Figures/graphs/all_weather_barplot.png", format="png", dpi=600, bbox_inches='tight')
+    logger.info(f"Saving bar plot figure for variable for all weather: precipitations.")
+    plt.savefig(f"template/Figures/graphs/all_weather_barplot_prec.png", format="png", dpi=600, bbox_inches='tight')
+    
+    g = sns.catplot(x="month", y="mean", hue="weather", data=means_obsc_df, kind="bar", legend_out=False, height=6, aspect=10/6, palette="rainbow")
+    plt.xlabel("")
+    plt.ylabel("Número de ocurrencias", fontsize=14)
+    plt.legend(framealpha=0.6)
+    
+    logger.info(f"Saving bar plot figure for variable for all weather: obscurations.")
+    plt.savefig(f"template/Figures/graphs/all_weather_barplot_obsc.png", format="png", dpi=600, bbox_inches='tight')

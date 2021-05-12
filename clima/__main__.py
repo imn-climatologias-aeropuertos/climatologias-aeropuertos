@@ -192,6 +192,7 @@ def all_weather(station: str):
         "Weather_intensity",
         "Weather_description",
         "Weather_precipitation",
+        "Weather_obscuration"
     ]
 
     station = station.lower()
