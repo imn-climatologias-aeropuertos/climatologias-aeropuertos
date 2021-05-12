@@ -55,9 +55,6 @@ def _handle_weather(df: pd.DataFrame, variable: str, weather: str):
     if weather == "RA":
         df = df.query('Weather_description != "SH" and Weather_description != "TS"')
 
-    if weather == "FG":
-        df = df.query('Weather_intensity != "VC"')
-
     ocurrences = np.count_nonzero(df[variable] == weather)
 
     if ocurrences > 0:
@@ -170,6 +167,8 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=
             vis_df = hour_df.query(f"{variable} <= 5000.0")
             mean = vis_df["Visibility"].sum() / (12 * len(years))
         elif variable in ["Weather_description", "Weather_obscuration"]:
+            # if weather == "FG":
+            #     df = df.query('Weather_intensity != "VC"')
             mean = np.count_nonzero(hour_df[variable] == weather) / (12 * len(years))
         elif variable == "Weather_precipitation":
             if weather == "RA":
@@ -202,3 +201,55 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=
 
     logger.info(f"Saving bar plot figure for variable {variable}" + ": {weather}." if weather != "" else ".")
     fig.savefig(f"template/Figures/graphs/bar_plot_{save_as}.png", format="png", dpi=600)
+
+
+def all_weather_bar_plot(df: pd.DataFrame, station: str):
+    #hours = hours_range(station)
+    means_dz = np.arange(12)
+    means_ra = np.arange(12)
+    means_sh = np.arange(12)
+    means_ts = np.arange(12)
+    years = df["Year"].unique()
+
+    logger.info(f"Getting the monthly DataFrames for all-weather bar plot.")
+    for i, month in enumerate(MONTHS):
+        month_df = df.query(f"Month == {i + 1}")
+        means = np.zeros(4)
+        
+        logger.info(f"Getting the yearly DataFrames for all-weather bar plot, month: {month}.")
+        for year in years:
+            year_df = month_df.query(f"Year == {year}")
+            
+            logger.info(f"Getting the dayly DataFrames for all-weather bar plot, year: {year}.")
+            for day in DAYS_PER_MONTH[i + 1]:
+                day_df = year_df.query(f"Day == {day}")
+                
+                means[0] += _handle_weather(day_df, "Weather_precipitation", "DZ")
+                means[1] += _handle_weather(day_df, "Weather_precipitation", "RA")
+                means[2] += _handle_weather(day_df, "Weather_description", "SH")
+                means[3] += _handle_weather(day_df, "Weather_description", "TS")
+            
+        means_dz[i] = Decimal(means[0] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        means_ra[i] = Decimal(means[1] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        means_sh[i] = Decimal(means[2] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+        means_ts[i] = Decimal(means[3] / len(years)).quantize(Decimal("1."), ROUND_HALF_UP)
+    
+    months_abbr = [m[0:3].upper() for m in MONTHS]
+    means_per_month = []
+    
+    logger.info(f"Creating DataFrame for all weather bar plots.")
+    for arr, weather in zip([means_dz, means_ra, means_sh, means_ts], ["DZ", "RA", "SHRA", "TS ó TSRA"]):
+        for i, m in enumerate(months_abbr):
+            row = [m, arr[i], weather]
+            means_per_month.append(row)
+    
+    means_df = pd.DataFrame(means_per_month, columns=["month", "mean", "weather"])
+    
+    sns.set()
+    g = sns.catplot(x="month", y="mean", hue="weather", data=means_df, kind="bar", legend_out=False, height=6, aspect=10/6, palette="rainbow")
+    plt.xlabel("")
+    plt.ylabel("Número de ocurrencias", fontsize=14)
+    plt.legend(framealpha=0.6)
+    
+    logger.info(f"Saving bar plot figure for variable for all weather.")
+    plt.savefig(f"template/Figures/graphs/all_weather_barplot.png", format="png", dpi=600, bbox_inches='tight')

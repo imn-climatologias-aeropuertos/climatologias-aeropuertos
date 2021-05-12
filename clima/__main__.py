@@ -3,7 +3,7 @@ import pandas as pd
 import yaml
 
 from . import __version__
-from .graphics.bar_plots import bar_plot, barfrec_plot
+from .graphics.bar_plots import bar_plot, barfrec_plot, all_weather_bar_plot
 from .graphics.contour_map import contour_map
 from .graphics.resume_table import generate_table
 from .graphics.time_series import single_time_series, time_series
@@ -181,6 +181,23 @@ def weather(station: str):
     bar_plot(df, station, "Weather_description", weather="TS", save_as="ts")
     bar_plot(df, station, "Weather_precipitation", weather="RA", save_as="ra")
     bar_plot(df, station, "Weather_obscuration", weather="BR", save_as="br")
+
+@cli.command()
+@click.argument("station", type=click.STRING)
+def all_weather(station: str):
+    columns = [
+        "Year",
+        "Month",
+        "Day",
+        "Weather_intensity",
+        "Weather_description",
+        "Weather_precipitation",
+    ]
+
+    station = station.lower()
+    df = pd.read_csv(f"data/{station}/{station}_metars.csv", usecols=columns)
+    
+    all_weather_bar_plot(df, station)
 
 
 @cli.command()
