@@ -215,7 +215,7 @@ def all_weather(ctx):
 
 @cli.command()
 @click.pass_context
-def cloud_height(ctx):
+def ceiling(ctx):
     station = ctx.obj["station"]
     columns = [
         "Year",
