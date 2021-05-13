@@ -3,7 +3,7 @@ import pandas as pd
 import yaml
 
 from . import __version__
-from .graphics.bar_plots import bar_plot, barfrec_plot, all_weather_bar_plot
+from .graphics.bar_plots import all_weather_bar_plot, bar_plot, barfrec_plot
 from .graphics.contour_map import contour_map
 from .graphics.resume_table import generate_table
 from .graphics.time_series import single_time_series, time_series
@@ -20,10 +20,10 @@ def cli(ctx, station: str):
     config_file = open("plot.config.yaml")
     plot_config = yaml.load(config_file, Loader=yaml.FullLoader)
     config_file.close()
-    
+
     df = pd.read_csv(f"data/{station}/{station}_metars.csv")
     df["Hour1_24"] = df["Hour"].replace(0, 24)
-    
+
     ctx.obj = {
         "plot_config": plot_config,
         "station": station.lower(),
@@ -48,7 +48,7 @@ def resume_table(ctx):
 def wind_direction(ctx):
     station = ctx.obj["station"]
     columns = ["Month", "Day", "Hour", "Wind_direction"]
-    
+
     config = ctx.obj["plot_config"]
     config = config[station][columns[-1].lower()]
 
@@ -80,7 +80,7 @@ def wind_direction(ctx):
 def wind_speed(ctx):
     station = ctx.obj["station"]
     columns = ["Month", "Day", "Hour", "Wind_speed"]
-    
+
     config = ctx.obj["plot_config"]
     config = config[station][columns[-1].lower()]
 
@@ -139,74 +139,58 @@ def weather(ctx):
 
     df = ctx.obj["data"][columns]
 
-    #barfrec_plot(
+    # barfrec_plot(
     #    df,
     #    station,
     #    "Weather_description",
     #    weather="SH",
     #    bp_label="Chubascos de lluvia (SHRA)",
     #    save_as="shra",
-    #)
-    #barfrec_plot(
+    # )
+    # barfrec_plot(
     #    df,
     #    station,
     #    "Weather_description",
     #    weather="TS",
     #    bp_label="Tormenta eléctrica (TS ó TSRA)",
     #    save_as="tsra",
-    #)
-    #barfrec_plot(
+    # )
+    # barfrec_plot(
     #    df,
     #    station,
     #    "Weather_precipitation",
     #    weather="RA",
     #    bp_label="Lluvia (RA)",
     #    save_as="ra",
-    #)
-    #barfrec_plot(
+    # )
+    # barfrec_plot(
     #    df,
     #    station,
     #    "Weather_precipitation",
     #    weather="DZ",
     #    bp_label="Llovizna (DZ)",
     #    save_as="dz",
-    #)
-    #barfrec_plot(
+    # )
+    # barfrec_plot(
     #    df,
     #    station,
     #    "Weather_obscuration",
     #    weather="BR",
     #    bp_label="Neblina (BR)",
     #    save_as="br",
-    #)
-    #barfrec_plot(
+    # )
+    # barfrec_plot(
     #    df,
     #    station,
     #    "Weather_obscuration",
     #    weather="FG",
     #    bp_label="Niebla (FG)",
     #    save_as="fg",
-    #)
+    # )
     bar_plot(df, station, "Weather_description", weather="TS", save_as="ts")
     bar_plot(df, station, "Weather_precipitation", weather="RA", save_as="ra")
     bar_plot(df, station, "Weather_obscuration", weather="BR", save_as="br")
 
-@cli.command()
-@click.pass_context
-def all_weather(ctx):
-    station = ctx.obj["station"]
-    columns = [
-        "Year",
-        "Month",
-        "Day",
-        "Weather_intensity",
-        "Weather_description",
-        "Weather_precipitation",
-        "Weather_obscuration"
-    ]
-
-    df = ctx.obj["data"][columns]
-    
     all_weather_bar_plot(df, station)
 
 
