@@ -107,7 +107,6 @@ def barfrec_plot(
             Decimal("1."), ROUND_HALF_UP
         )
     frecs = 100 * month_means / len(DAYS_PER_MONTH[month])
-    print(month_means, frecs)
 
     sns.set()
     fig, ax = plt.subplots(figsize=(10, 6))
