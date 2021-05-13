@@ -12,14 +12,22 @@ from .graphics.wind_direction import heat_map
 f = open("logging.log", "w")
 f.close()
 
-config_file = open("plot.config.yaml")
-PLOT_CONFIG = yaml.load(config_file, Loader=yaml.FullLoader)
-config_file.close()
-
 
 @click.group()
-def cli():
-    pass
+@click.argument("station", type=click.STRING)
+@click.pass_context
+def cli(ctx, station: str):
+    config_file = open("plot.config.yaml")
+    plot_config = yaml.load(config_file, Loader=yaml.FullLoader)
+    config_file.close()
+    
+    df = pd.read_csv(f"data/{station}/{station}_metars.csv")
+    
+    ctx.obj = {
+        "plot_config": plot_config,
+        "station": station.lower(),
+        "data": df,
+    }
 
 
 @cli.command()
@@ -28,20 +36,22 @@ def version():
 
 
 @cli.command()
-@click.argument("station", type=click.STRING)
-def resume_table(station: str):
-    station = station.lower()
+@click.pass_context
+def resume_table(ctx):
+    station = ctx.obj["station"]
     generate_table(station)
 
 
 @cli.command()
-@click.argument("station", type=click.STRING)
-def wind_direction(station: str):
+@click.pass_context
+def wind_direction(ctx):
+    station = ctx.obj["station"]
     columns = ["Month", "Day", "Hour", "Wind_direction"]
-    config = PLOT_CONFIG[station][columns[-1].lower()]
+    
+    config = ctx.obj["plot_config"]
+    config = config[station][columns[-1].lower()]
 
-    station = station.lower()
-    df = pd.read_csv(f"data/{station}/{station}_metars.csv", usecols=columns)
+    df = ctx.obj["data"][columns]
     df["Hour1_24"] = df["Hour"].replace(0, 24)
     label = "Dirección del viento (°)"
 
@@ -66,13 +76,15 @@ def wind_direction(station: str):
 
 
 @cli.command()
-@click.argument("station", type=click.STRING)
-def wind_speed(station: str):
+@click.pass_context
+def wind_speed(ctx):
+    station = ctx.obj["station"]
     columns = ["Month", "Day", "Hour", "Wind_speed"]
-    config = PLOT_CONFIG[station][columns[-1].lower()]
+    
+    config = ctx.obj["plot_config"]
+    config = config[station][columns[-1].lower()]
 
-    station = station.lower()
-    df = pd.read_csv(f"data/{station}/{station}_metars.csv", usecols=columns)
+    df = ctx.obj["data"][columns]
     df["Hour1_24"] = df["Hour"].replace(0, 24)
 
     contour_map(
@@ -94,12 +106,12 @@ def wind_speed(station: str):
 
 
 @cli.command()
-@click.argument("station", type=click.STRING)
-def visibility(station: str):
+@click.pass_context
+def visibility(ctx):
+    station = ctx.obj["station"]
     columns = ["Year", "Month", "Day", "Hour", "Visibility", "Cavok"]
 
-    station = station.lower()
-    df = pd.read_csv(f"data/{station}/{station}_metars.csv", usecols=columns)
+    df = ctx.obj["data"][columns]
     df["Hour1_24"] = df["Hour"].replace(0, 24)
 
     barfrec_plot(df, station, "Cavok", bp_label="CAVOK", save_as="cavok")
@@ -113,8 +125,9 @@ def visibility(station: str):
 
 
 @cli.command()
-@click.argument("station", type=click.STRING)
-def weather(station: str):
+@click.pass_context
+def weather(ctx):
+    station = ctx.obj["station"]
     columns = [
         "Year",
         "Month",
@@ -126,8 +139,7 @@ def weather(station: str):
         "Weather_obscuration",
     ]
 
-    station = station.lower()
-    df = pd.read_csv(f"data/{station}/{station}_metars.csv", usecols=columns)
+    df = ctx.obj["data"][columns]
     df["Hour1_24"] = df["Hour"].replace(0, 24)
 
     #barfrec_plot(
@@ -183,8 +195,9 @@ def weather(station: str):
     bar_plot(df, station, "Weather_obscuration", weather="BR", save_as="br")
 
 @cli.command()
-@click.argument("station", type=click.STRING)
-def all_weather(station: str):
+@click.pass_context
+def all_weather(ctx):
+    station = ctx.obj["station"]
     columns = [
         "Year",
         "Month",
@@ -195,15 +208,15 @@ def all_weather(station: str):
         "Weather_obscuration"
     ]
 
-    station = station.lower()
-    df = pd.read_csv(f"data/{station}/{station}_metars.csv", usecols=columns)
+    df = ctx.obj["data"][columns]
     
     all_weather_bar_plot(df, station)
 
 
 @cli.command()
-@click.argument("station", type=click.STRING)
-def cloud_height(station: str):
+@click.pass_context
+def cloud_height(ctx):
+    station = ctx.obj["station"]
     columns = [
         "Year",
         "Month",
@@ -215,8 +228,7 @@ def cloud_height(station: str):
         "Sky_layer4_height",
     ]
 
-    station = station.lower()
-    df = pd.read_csv(f"data/{station}/{station}_metars.csv", usecols=columns)
+    df = ctx.obj["data"][columns]
     df["Hour1_24"] = df["Hour"].replace(0, 24)
 
     # barfrec_plot(df, station, "Sky_layer_height", bp_label="Techo de nubes", save_as="ceiling")
