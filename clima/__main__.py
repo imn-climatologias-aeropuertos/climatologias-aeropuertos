@@ -22,6 +22,7 @@ def cli(ctx, station: str):
     config_file.close()
     
     df = pd.read_csv(f"data/{station}/{station}_metars.csv")
+    df["Hour1_24"] = df["Hour"].replace(0, 24)
     
     ctx.obj = {
         "plot_config": plot_config,
@@ -52,7 +53,6 @@ def wind_direction(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    df["Hour1_24"] = df["Hour"].replace(0, 24)
     label = "Dirección del viento (°)"
 
     heat_map(df, station)
@@ -85,7 +85,6 @@ def wind_speed(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    df["Hour1_24"] = df["Hour"].replace(0, 24)
 
     contour_map(
         df,
@@ -112,7 +111,6 @@ def visibility(ctx):
     columns = ["Year", "Month", "Day", "Hour", "Visibility", "Cavok"]
 
     df = ctx.obj["data"][columns]
-    df["Hour1_24"] = df["Hour"].replace(0, 24)
 
     barfrec_plot(df, station, "Cavok", bp_label="CAVOK", save_as="cavok")
     barfrec_plot(
@@ -140,7 +138,6 @@ def weather(ctx):
     ]
 
     df = ctx.obj["data"][columns]
-    df["Hour1_24"] = df["Hour"].replace(0, 24)
 
     #barfrec_plot(
     #    df,
@@ -229,7 +226,6 @@ def ceiling(ctx):
     ]
 
     df = ctx.obj["data"][columns]
-    df["Hour1_24"] = df["Hour"].replace(0, 24)
 
     # barfrec_plot(df, station, "Sky_layer_height", bp_label="Techo de nubes", save_as="ceiling")
     bar_plot(df, station, "Sky_layer_height")
