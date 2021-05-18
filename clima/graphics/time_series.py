@@ -6,7 +6,7 @@ import seaborn as sns
 
 from clima.graphics import DAYS_PER_MONTH
 from clima.graphics import MONTHS as months
-from clima.graphics import hours_range, local_time_list
+from clima.graphics import frange, hours_range, local_time_list
 from clima.logger_model import logger
 
 
@@ -88,9 +88,14 @@ def time_series(
         axs[ax_i].set_xticks(reduce_list(list(hours_array)))
         axs[ax_i].set_xlabel("")
         axs[ax_i].set_ylabel(yaxis_label, size=16)
+        # axs[ax_i].set_yticks(
+        #     list(frange(config["min"], config["max"], config["tick_jump"]))
+        # )
         axs[ax_i].set_yticks(
-            [x for x in range(config["min"], config["max"], config["tick_jump"])]
-        )
+            np.arange(config["min"], config["max"], config["tick_jump"]))
+        # axs[ax_i].set_yticks(
+        #     [x for x in range(config["min"], config["max"], config["tick_jump"])]
+        # )
 
         if month_i in [2, 3, 5, 6, 8, 9, 11, 12]:
             axs[ax_i].set_yticklabels([])

@@ -30,6 +30,14 @@ def local_time_list(times: list):
     return [f"{i}:00".replace("24", "00") if i > 9 else f"0{i}:00" for i in local_times]
 
 
+def frange(start, stop, step):
+    while start < stop:
+        yield start
+        start += step
+        start = str("{:.2f}".format(start))
+        start = float(start)
+
+
 MONTHS = [
     "Enero",
     "Febrero",

@@ -83,13 +83,13 @@ def barfrec_plot(
         month_sum = 0
 
         logger.info(
-            f"Getting the yearly DataFrames for bar-frecuencies plot, variable: {variable}."
+            f"Month: {month}. Getting the yearly DataFrames for bar-frecuencies plot, variable: {variable}."
         )
         for year in years:
             month_df = df.query(f"Year == {year} and Month == {month}")
 
             logger.info(
-                f"Getting the dayly DataFrames for bar-frecuencies plot, variable: {variable}, and calculating the means."
+                f"Year: {year}. Getting the dayly DataFrames for bar-frecuencies plot, variable: {variable}."
             )
             for day in DAYS_PER_MONTH[month]:
                 day_df = month_df.query(f"Day == {day}")
@@ -163,11 +163,9 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=
         if variable == "Cavok":
             mean = hour_df[variable].sum() / (12 * len(years))
         elif variable == "Visibility":
-            vis_df = hour_df.query(f"{variable} <= 5000.0")
-            mean = vis_df["Visibility"].sum() / (12 * len(years))
+            mean = np.count_nonzero(hour_df[variable] <= 5000.0) / (12 * len(years))
         elif variable in ["Weather_description", "Weather_obscuration"]:
-            # if weather == "FG":
-            #     df = df.query('Weather_intensity != "VC"')
+            hour_df = hour_df.query('Weather_intensity != "VC"')
             mean = np.count_nonzero(hour_df[variable] == weather) / (12 * len(years))
         elif variable == "Weather_precipitation":
             if weather == "RA":

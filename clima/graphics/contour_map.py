@@ -5,7 +5,7 @@ import pandas as pd
 
 from clima.graphics import DAYS_PER_MONTH
 from clima.graphics import MONTHS as months
-from clima.graphics import hours_range, local_time_list
+from clima.graphics import frange, hours_range, local_time_list
 from clima.logger_model import logger
 
 
@@ -78,11 +78,16 @@ def contour_map(
         axs[month_i - 1].set_title(month, weight="bold", size=16)
 
     cbar_ax = fig.add_axes([0.85, 0.25, 0.02, 0.5])
-    bounds = list(
-        map(
-            int, np.linspace(config["min"], config["max"], config["ticks_num"]).tolist()
+    if variable == "Pressure":
+        #bounds = list(frange(config["min"], config["max"], config["ticks_num"]))
+        bounds = np.arange(config["min"], config["max"], config["ticks_num"])
+    else:
+        bounds = list(
+            map(
+                int,
+                np.linspace(config["min"], config["max"], config["ticks_num"]).tolist(),
+            )
         )
-    )
     norm = mpl.colors.BoundaryNorm(bounds, cmap.N, extend="both")
     cb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cbar_ax)
     cb.set_label(label=cbar_label, size=20)

@@ -1,6 +1,6 @@
-###################################
-# Config data for the plots of MROC
-###################################
+#####################################
+# Config data for the plots of MROC #
+#####################################
 mroc:
   wind_direction:
     contour_map:
@@ -22,17 +22,65 @@ mroc:
     contour_map:
       min: 2
       max: 18
-      ticks_num: 10
+      ticks_num: 9
     time_series:
       min: 3
-      max: 21
+      max: 19
       tick_jump: 3
       hline:
         - 
+  
+  wind_gust:
+    contour_map:
+      min: 16
+      max: 30
+      ticks_num: 8
+    time_series:
+      min: 16
+      max: 31
+      tick_jump: 2
+      hline:
+        - 
+  
+  temperature:
+    contour_map:
+      min: 16
+      max: 30
+      ticks_num: 8
+    time_series:
+      min: 16
+      max: 31
+      tick_jump: 2
+      hline:
+        - 
+  
+  dewpoint:
+    contour_map:
+      min: 12
+      max: 22
+      ticks_num: 6
+    time_series:
+      min: 12
+      max: 24
+      tick_jump: 2
+      hline:
+        - 
+  
+  pressure:
+    contour_map:
+      min: 29.90
+      max: 30.06
+      ticks_num: 0.02
+    time_series:
+      min: 29.90
+      max: 30.07
+      tick_jump: 0.02
+      hline:
+        - 
 
-###################################
-# Config data for the plots of MRLB
-###################################
+#####################################
+# Config data for the plots of MRLB #
+#####################################
 mrlb:
   wind_direction:
     contour_map:
@@ -62,9 +110,9 @@ mrlb:
       hline:
         -
 
-###################################
-# Config data for the plots of MRLM
-###################################
+#####################################
+# Config data for the plots of MRLM #
+#####################################
 mrlm:
   wind_direction:
     contour_map:
@@ -90,9 +138,9 @@ mrlm:
       hline:
         - 
 
-###################################
-# Config data for the plots of MRPV
-###################################
+#####################################
+# Config data for the plots of MRPV #
+#####################################
 mrpv:
   wind_direction:
     contour_map:
