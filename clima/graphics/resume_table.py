@@ -5,12 +5,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from clima.graphics import DAYS_PER_MONTH
-from clima.graphics import MONTHS as months
+from clima.graphics import DAYS_PER_MONTH, MONTHS, dpi
 from clima.logger_model import logger
 
-local_months = months.copy()
-local_months.append("Anual")
+months = list(MONTHS)
+months.append("Anual")
 
 
 def _handle_precipitation(df: pd.DataFrame):
@@ -18,29 +17,29 @@ def _handle_precipitation(df: pd.DataFrame):
     total_prec_days = 0
     total_prec = 0.0
 
-    for i in range(1, 13):
+    for i, month in enumerate(months[:-1], start=1):
         data_per_month = []
-        month = df.query(f"Mes == {i}")
+        month_df = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean if the mean is >= 0.1 else 0.0
         for day in DAYS_PER_MONTH[i]:
-            mean_prec = month[day].mean()
-            month[day] = month[day].fillna(mean_prec if mean_prec >= 0.1 else 0.0)
+            mean_prec = month_df[day].mean()
+            month_df[day] = month_df[day].fillna(mean_prec if mean_prec >= 0.1 else 0.0)
 
         # Obtain the precipitation sum for every row (month by year) and its mean
-        logger.info(f"Obtaining precipitation sum for month: {i}")
-        month["sum"] = month[DAYS_PER_MONTH[i]].sum(axis=1)
+        logger.info(f"Obtaining precipitation sum for month: {month}")
+        month_df["sum"] = month_df[DAYS_PER_MONTH[i]].sum(axis=1)
         mean_prec = float(
-            Decimal(month["sum"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
+            Decimal(month_df["sum"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
         data_per_month.append(mean_prec)
         total_prec += mean_prec
 
         # Obtain the days with precipitation registered and its mean
-        logger.info(f"Obtaining days with precipitation for month: {i}")
-        month["days with prec"] = (month[DAYS_PER_MONTH[i]] != 0.0).T.sum()
+        logger.info(f"Obtaining days with precipitation for month: {month}")
+        month_df["days with prec"] = (month_df[DAYS_PER_MONTH[i]] != 0.0).T.sum()
         mean_days_with_prec = int(
-            Decimal(month["days with prec"].mean()).quantize(
+            Decimal(month_df["days with prec"].mean()).quantize(
                 Decimal("1."), ROUND_HALF_UP
             )
         )
@@ -58,22 +57,24 @@ def _handle_tmax(df: pd.DataFrame):
     extreme_tmax = 0.0
     mean_tmax = 0.0
 
-    for i in range(1, 13):
+    for i, month in enumerate(months[:-1], start=1):
         data_per_month = []
-        month = df.query(f"Mes == {i}")
+        month_df = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean
         for day in DAYS_PER_MONTH[i]:
-            day_mean = month[day].mean()
-            month[day] = month[day].fillna(day_mean)
+            day_mean = month_df[day].mean()
+            month_df[day] = month_df[day].fillna(day_mean)
 
         # Obtain the tmax extreme and mean per every month (same month) by year
-        month["tmax"] = month[DAYS_PER_MONTH[i]].max(axis=1)
+        logger.info(f"Obtaining mean tmax for month: {month}")
+        month_df["tmax"] = month_df[DAYS_PER_MONTH[i]].max(axis=1)
         mean_tmax_of_month = float(
-            Decimal(month["tmax"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
+            Decimal(month_df["tmax"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
+        logger.info(f"Obtaining extreme tmax for month: {month}")
         extreme_tmax_of_month = float(
-            Decimal(month["tmax"].max()).quantize(Decimal(".1"), ROUND_HALF_UP)
+            Decimal(month_df["tmax"].max()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
 
         data_per_month.append(extreme_tmax_of_month)
@@ -100,22 +101,24 @@ def _handle_tmin(df: pd.DataFrame):
     extreme_tmin = 100.0
     mean_tmin = 0.0
 
-    for i in range(1, 13):
+    for i, month in enumerate(months[:-1], start=1):
         data_per_month = []
-        month = df.query(f"Mes == {i}")
+        month_df = df.query(f"Mes == {i}")
 
         # Fill the NaN values by the mean
         for day in DAYS_PER_MONTH[i]:
-            day_mean = month[day].mean()
-            month[day] = month[day].fillna(day_mean)
+            day_mean = month_df[day].mean()
+            month_df[day] = month_df[day].fillna(day_mean)
 
         # Obtain the tmin extreme and mean per every month (same month) by year
-        month["tmin"] = month[DAYS_PER_MONTH[i]].min(axis=1)
+        logger.info(f"Obtaining mean tmin for month: {month}")
+        month_df["tmin"] = month_df[DAYS_PER_MONTH[i]].min(axis=1)
         mean_tmin_of_month = float(
-            Decimal(month["tmin"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
+            Decimal(month_df["tmin"].mean()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
+        logger.info(f"Obtaining extreme tmin for month: {month}")
         extreme_tmin_of_month = float(
-            Decimal(month["tmin"].min()).quantize(Decimal(".1"), ROUND_HALF_UP)
+            Decimal(month_df["tmin"].min()).quantize(Decimal(".1"), ROUND_HALF_UP)
         )
 
         data_per_month.append(extreme_tmin_of_month)
@@ -203,12 +206,12 @@ def _generate_climogram(station: str, data: list):
     sns.set()
     ax2.legend(handles=all_handles, loc="upper left", framealpha=0.9)
     # ax.tick_params(axis='y')
-    fig.savefig("template/Figures/graphs/climograma.png", format="png", dpi=600)
+    fig.savefig("template/Figures/graphs/climograma.png", format="png", dpi=dpi)
 
 
 LATEX_HEADER = """
 \\begin{table}[htb]
-\caption{Resumen de variables meteorológicas, \icaoCode{} \yearsRange{}.}
+\caption{Resumen de variables meteorológicas, \icaoCode{} \\resumeYearsRange{}.}
 \label{table:resumen}
 \\begin{center}
 \\begin{tabular}{>{\centering}p{0.12\\textwidth}>
@@ -247,7 +250,7 @@ def generate_table(station: str):
 
     data = []
     latex_table = ""
-    for m, tx, tn, pcp in zip(local_months, tmax_data, tmin_data, prec_data):
+    for m, tx, tn, pcp in zip(months, tmax_data, tmin_data, prec_data):
         month_data = [
             m,
             str(tx[0]),
