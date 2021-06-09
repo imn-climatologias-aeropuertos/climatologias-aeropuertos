@@ -42,5 +42,13 @@ tests:
 	PYTHONPATH=. $(POETRY_RUN) pytest -vv test
 
 run:
-	python -m clima resume-table $(STATION)
-	python -m clima wind-direction $(STATION)
+	python -m clima $(STATION) resume-table
+	python -m clima $(STATION) wind-direction
+	python -m clima $(STATION) wind-speed
+	python -m clima $(STATION) wind-gust
+	python -m clima $(STATION) temperature
+	python -m clima $(STATION) dewpoint
+	python -m clima $(STATION) pressure
+	python -m clima $(STATION) visibility
+	python -m clima $(STATION) weather
+	python -m clima $(STATION) ceiling
