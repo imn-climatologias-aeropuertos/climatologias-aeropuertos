@@ -3,9 +3,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sbn
 
-from clima.graphics import MONTHS as months
-from clima.graphics import hours_range, local_time_list
+from clima.graphics import MONTHS
+from clima.graphics import dpi, hours_range, local_time_list
 from clima.logger_model import logger
+
+months = list(MONTHS)
 
 
 def _cardinal_point(value: float):
@@ -35,16 +37,16 @@ def heat_map(df: pd.DataFrame, station: str):
     cardinal_points_per_month = []
 
     # For every month, get data
-    logger.info("Getting the monthly DataFrames")
-    for i in range(1, 13):
-        month = df.query(f"Month == {i}")
+    logger.info("Getting the monthly DataFrames for wind direction heatmap")
+    for i, month in enumerate(months, start=1):
+        month_df = df.query(f"Month == {i}")
         means_per_hour = []
         cardinal_points_per_hour = []
 
         # For every hour, get the mean
-        logger.info("Getting the hourly DataFrames and calculating the means values.")
+        logger.info(f"Getting the hourly DataFrames and calculating the means values for month: {month}.")
         for j in hours_range(station):
-            hour = month.query(f"Hour1_24 == {j}")
+            hour = month_df.query(f"Hour1_24 == {j}")
             mean = hour["Wind_direction"].mean()
 
             # Store the hourly means per month
@@ -79,4 +81,4 @@ def heat_map(df: pd.DataFrame, station: str):
     )
 
     logger.info(f"Saving heat map figure for wind direction.")
-    fig.savefig(f"template/Figures/graphs/heatmap_wind_dir.png", format="png", dpi=600)
+    fig.savefig(f"template/Figures/graphs/heatmap_wind_dir.png", format="png", dpi=dpi)
