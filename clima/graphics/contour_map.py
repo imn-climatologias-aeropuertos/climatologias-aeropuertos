@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from clima.graphics import DAYS_PER_MONTH
-from clima.graphics import MONTHS as months
-from clima.graphics import frange, hours_range, local_time_list
+from clima.graphics import DAYS_PER_MONTH, MONTHS, dpi, hours_range, local_time_list
 from clima.logger_model import logger
+
+months = list(MONTHS)
 
 
 def contour_map(
@@ -31,14 +31,13 @@ def contour_map(
     logger.info(
         f"Getting the monthly DataFrames for contour map, variable: {variable}."
     )
-    for month in months:
-        month_i = months.index(month) + 1
+    for i, month in enumerate(months, start=1):
         month_means = []
-        month_df = df.query(f"Month == {month_i}")
+        month_df = df.query(f"Month == {i}")
 
         # Get the day df for every month
         logger.info(f"Getting the dayly DataFrames for month {month}.")
-        for day in DAYS_PER_MONTH[month_i]:
+        for day in DAYS_PER_MONTH[i]:
             day = int(day)
             day_means = []
             day_df = month_df.query(f"Day == {day}")
@@ -55,7 +54,7 @@ def contour_map(
             month_means.append(day_means)
 
         month_means_array = np.array(month_means)
-        days_array = np.array(list(map(int, DAYS_PER_MONTH[month_i])))
+        days_array = np.array(list(map(int, DAYS_PER_MONTH[i])))
 
         logger.info(
             f"Generating the contour map for month {month} of variable {variable}."
@@ -63,23 +62,23 @@ def contour_map(
         X, Y = np.meshgrid(days_array, hours_array)
         Z = month_means_array.T
         # plt.yticks(hours_array.tolist(), local_time_list(hours))
-        im = axs[month_i - 1].contourf(
+        im = axs[i - 1].contourf(
             X, Y, Z, cmap=cmap, vmax=config["max"], vmin=config["min"]
         )
-        axs[month_i - 1].set_yticks(list(hours_array))
+        axs[i - 1].set_yticks(list(hours_array))
 
         # yticklabels hidden for more right plots
-        if month_i in [1, 4, 7, 10]:
-            axs[month_i - 1].set_yticklabels(local_time_list(hours))
+        if i in [1, 4, 7, 10]:
+            axs[i - 1].set_yticklabels(local_time_list(hours))
         else:
-            axs[month_i - 1].set_yticklabels([])
+            axs[i - 1].set_yticklabels([])
 
         # set the title for every plot (the month name)
-        axs[month_i - 1].set_title(month, weight="bold", size=16)
+        axs[i - 1].set_title(month, weight="bold", size=16)
 
     cbar_ax = fig.add_axes([0.85, 0.25, 0.02, 0.5])
     if variable == "Pressure":
-        #bounds = list(frange(config["min"], config["max"], config["ticks_num"]))
+        # bounds = list(frange(config["min"], config["max"], config["ticks_num"]))
         bounds = np.arange(config["min"], config["max"], config["ticks_num"])
     else:
         bounds = list(
@@ -97,5 +96,5 @@ def contour_map(
 
     logger.info(f"Saving contour map figure for variable {variable}.")
     fig.savefig(
-        f"template/Figures/graphs/contourmap_{save_as}.png", format="png", dpi=300
+        f"template/Figures/graphs/contourmap_{save_as}.png", format="png", dpi=dpi
     )
