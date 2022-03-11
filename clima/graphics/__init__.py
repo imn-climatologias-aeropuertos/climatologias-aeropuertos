@@ -67,3 +67,5 @@ DAYS_PER_MONTH = {
     11: _days_of_month(30),
     12: _days_of_month(31),
 }
+
+dpi = 100
