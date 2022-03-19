@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from clima.graphics import DAYS_PER_MONTH, MONTHS, hours_range, local_time_list
+from clima.graphics import DAYS_PER_MONTH, MONTHS, hours_range, local_time_list, dpi
 from clima.logger_model import logger
 
 time_ranges = {19: 9, 13: 6, 24: 12}
@@ -144,7 +144,7 @@ def barfrec_plot(
 
     logger.info(f"Saving bar-frecuencies plot figure for variable {variable}.")
     fig.savefig(
-        f"template/Figures/graphs/barfrec_plot_{save_as}.png", format="png", dpi=600
+        f"template/Figures/graphs/barfrec_plot_{save_as}.png", format="png", dpi=dpi
     )
 
 
@@ -202,7 +202,7 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=
         else "."
     )
     fig.savefig(
-        f"template/Figures/graphs/bar_plot_{save_as}.png", format="png", dpi=600
+        f"template/Figures/graphs/bar_plot_{save_as}.png", format="png", dpi=dpi
     )
 
 
@@ -308,7 +308,7 @@ def all_weather_bar_plot(df: pd.DataFrame, station: str):
     plt.savefig(
         f"template/Figures/graphs/all_weather_barplot_prec.png",
         format="png",
-        dpi=600,
+        dpi=dpi,
         bbox_inches="tight",
     )
 
@@ -331,6 +331,6 @@ def all_weather_bar_plot(df: pd.DataFrame, station: str):
     plt.savefig(
         f"template/Figures/graphs/all_weather_barplot_obsc.png",
         format="png",
-        dpi=600,
+        dpi=dpi,
         bbox_inches="tight",
     )
