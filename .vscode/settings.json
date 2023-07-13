@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/home/diego/.local/share/virtualenvs/climatology-airports-cPlJOxKm/bin/python",
+    "python.pythonPath": "/usr/bin/python3",
     "jupyter.jupyterServerType": "local"
 }

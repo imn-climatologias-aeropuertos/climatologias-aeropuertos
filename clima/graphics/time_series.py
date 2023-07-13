@@ -6,7 +6,7 @@ import seaborn as sns
 
 from clima.graphics import DAYS_PER_MONTH
 from clima.graphics import MONTHS as months
-from clima.graphics import frange, hours_range, local_time_list
+from clima.graphics import dpi, frange, hours_range, local_time_list
 from clima.logger_model import logger
 
 
@@ -92,7 +92,8 @@ def time_series(
         #     list(frange(config["min"], config["max"], config["tick_jump"]))
         # )
         axs[ax_i].set_yticks(
-            np.arange(config["min"], config["max"], config["tick_jump"]))
+            np.arange(config["min"], config["max"], config["tick_jump"])
+        )
         # axs[ax_i].set_yticks(
         #     [x for x in range(config["min"], config["max"], config["tick_jump"])]
         # )
@@ -117,7 +118,7 @@ def time_series(
 
     logger.info(f"Saving time series figure for variable {variable}.")
     fig.savefig(
-        f"template/Figures/graphs/time_series_{save_as}.png", format="png", dpi=300
+        f"template/Figures/graphs/time_series_{save_as}.png", format="png", dpi=dpi
     )
 
 
@@ -141,5 +142,5 @@ def single_time_series(df: pd.DataFrame, variable: str, yaxis_label="", save_as=
     fig.savefig(
         f"template/Figures/graphs/single_time_series_{save_as}.png",
         format="png",
-        dpi=300,
+        dpi=dpi,
     )

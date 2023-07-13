@@ -38,6 +38,9 @@ def frange(start, stop, step):
         start = float(start)
 
 
+dpi = 150
+
+
 MONTHS = [
     "Enero",
     "Febrero",

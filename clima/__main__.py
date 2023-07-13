@@ -3,7 +3,12 @@ import pandas as pd
 import yaml
 
 from . import __version__
-from .graphics.bar_plots import all_weather_bar_plot, bar_plot, barfrec_plot
+from .graphics.bar_plots import (
+    all_weather_bar_plot,
+    bar_plot,
+    barfrec_plot,
+    gusts_bar_plot,
+)
 from .graphics.contour_map import contour_map
 from .graphics.resume_table import generate_table
 from .graphics.time_series import single_time_series, time_series
@@ -110,7 +115,7 @@ def wind_speed(ctx):
 @click.pass_context
 def wind_gust(ctx):
     station = ctx.obj["station"]
-    columns = ["Month", "Day", "Hour", "Hour1_24", "Wind_gust"]
+    columns = ["Year", "Month", "Day", "Hour", "Hour1_24", "Wind_gust"]
 
     config = ctx.obj["plot_config"]
     config = config[station][columns[-1].lower()]
@@ -135,6 +140,7 @@ def wind_gust(ctx):
         config=config["time_series"],
     )
     single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
+    gusts_bar_plot(df)
 
 
 @cli.command()
@@ -323,7 +329,7 @@ def weather(ctx):
     bar_plot(df, station, "Weather_obscuration", weather="FG", save_as="fg")
     bar_plot(df, station, "Weather_obscuration", weather="BR", save_as="br")
 
-    all_weather_bar_plot(df, station)
+    all_weather_bar_plot(df)
 
 
 @cli.command()
