@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from clima.graphics import DAYS_PER_MONTH, MONTHS, hours_range, local_time_list
+from clima.graphics import DAYS_PER_MONTH, dpi, MONTHS, hours_range, local_time_list
+
 from clima.logger_model import logger
 
 time_ranges = {19: 9, 13: 6, 24: 12}
@@ -344,6 +345,100 @@ def all_weather_bar_plot(df: pd.DataFrame):
     plt.savefig(
         f"template/Figures/graphs/all_weather_barplot_obsc.png",
         format="png",
-        dpi=600,
+        dpi=dpi,
+        bbox_inches="tight",
+    )
+
+
+def _handle_gusts(df: pd.DataFrame, grange=(0, 20)):
+    ocurrences = np.count_nonzero(df["Wind_gust"] < grange[1]) - np.count_nonzero(
+        df["Wind_gust"] < grange[0]
+    )
+
+    if ocurrences > 0:
+        return 1
+
+    return 0
+
+
+def gusts_bar_plot(df: pd.DataFrame):
+    gust_19 = np.arange(12)
+    gust_29 = np.arange(12)
+    gust_39 = np.arange(12)
+    gust_40 = np.arange(12)
+    years = df["Year"].unique()
+
+    logger.info(f"Getting the monthly DataFrames for gusts bar plot.")
+    for i, month in enumerate(MONTHS):
+        month_df = df.query(f"Month == {i + 1}")
+        means = np.zeros(4)
+
+        logger.info(
+            f"Getting the yearly DataFrames for gusts bar plot, month: {month}."
+        )
+        for year in years:
+            year_df = month_df.query(f"Year == {year}")
+
+            logger.info(
+                f"Getting the dayly DataFrames for gusts bar plot, year: {year}."
+            )
+            for day in DAYS_PER_MONTH[i + 1]:
+                day_df = year_df.query(f"Day == {day}")
+
+                means[0] += _handle_gusts(day_df)
+                means[1] += _handle_gusts(day_df, grange=(20, 30))
+                means[2] += _handle_gusts(day_df, grange=(30, 40))
+                means[3] += _handle_gusts(day_df, grange=(40, 50))
+
+        gust_19[i] = Decimal(means[0] / len(years)).quantize(
+            Decimal("1."), ROUND_HALF_UP
+        )
+        gust_29[i] = Decimal(means[1] / len(years)).quantize(
+            Decimal("1."), ROUND_HALF_UP
+        )
+        gust_39[i] = Decimal(means[2] / len(years)).quantize(
+            Decimal("1."), ROUND_HALF_UP
+        )
+        gust_40[i] = Decimal(means[3] / len(years)).quantize(
+            Decimal("1."), ROUND_HALF_UP
+        )
+
+    months_abbr = [m[0:3].upper() for m in MONTHS]
+    means_gust_per_month = []
+
+    logger.info(f"Creating DataFrame for gusts bar plots.")
+    for arr, weather in zip(
+        [gust_19, gust_29, gust_39, gust_40],
+        ["19 kt o menos", "20-29 kt", "30-39 kt", "40 kt o más"],
+    ):
+        for i, m in enumerate(months_abbr):
+            row = [m, arr[i], weather]
+            means_gust_per_month.append(row)
+
+    means_gust_df = pd.DataFrame(
+        means_gust_per_month, columns=["month", "mean", "gust"]
+    )
+
+    sns.set_theme()
+    g = sns.catplot(
+        x="month",
+        y="mean",
+        hue="gust",
+        data=means_gust_df,
+        kind="bar",
+        legend_out=False,
+        height=6,
+        aspect=10 / 6,
+        palette="rainbow",
+    )
+    plt.xlabel("Mes")
+    plt.ylabel("Número de ocurrencias", fontsize=14)
+    plt.legend(framealpha=0.6)
+
+    logger.info(f"Saving bar plot figure for variable for gusts.")
+    plt.savefig(
+        f"template/Figures/graphs/gusts_barplot.png",
+        format="png",
+        dpi=dpi,
         bbox_inches="tight",
     )
