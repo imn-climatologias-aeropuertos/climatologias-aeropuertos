@@ -75,6 +75,8 @@ def contour_map(
 
         # set the title for every plot (the month name)
         axs[i - 1].set_title(month, weight="bold", size=16)
+        axs[i -1].set_xlabel("Día del mes", size=10)
+        axs[i -1].set_ylabel("Hora de operación", size=10)
 
     cbar_ax = fig.add_axes([0.85, 0.25, 0.02, 0.5])
     if variable == "Pressure":
@@ -91,7 +93,12 @@ def contour_map(
     cb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cbar_ax)
     cb.set_label(label=cbar_label, size=20)
     fig.subplots_adjust(
-        bottom=0.05, top=0.95, left=0.1, right=0.8, wspace=0.2, hspace=0.2
+        bottom=0.05,
+        top=0.97,
+        left=0.1,
+        right=0.8,
+        wspace=0.2,
+        hspace=0.25,
     )
 
     logger.info(f"Saving contour map figure for variable {variable}.")

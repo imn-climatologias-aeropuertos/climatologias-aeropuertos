@@ -102,11 +102,11 @@ mrlb:
     contour_map:
       min: 2
       max: 20
-      ticks_num: 9
+      ticks_num: 10
     time_series:
       min: 1
-      max: 19
-      tick_jump: 3
+      max: 20
+      tick_jump: 2
       hline:
         -
 
@@ -129,11 +129,11 @@ mrlb:
       ticks_num: 8
     time_series:
       min: 22
-      max: 37
+      max: 38
       tick_jump: 2
       hline:
-        -
-
+        - 
+  
   dewpoint:
     contour_map:
       min: 16
@@ -141,7 +141,7 @@ mrlb:
       ticks_num: 9
     time_series:
       min: 16
-      max: 26
+      max: 27
       tick_jump: 2
       hline:
         -
@@ -149,11 +149,11 @@ mrlb:
   pressure:
     contour_map:
       min: 29.74
-      max: 29.90
+      max: 29.91
       ticks_num: 0.02
     time_series:
       min: 29.74
-      max: 29.90
+      max: 29.91
       tick_jump: 0.02
       hline:
         -
@@ -184,7 +184,7 @@ mrlm:
       ticks_num: 9
     time_series:
       min: 2
-      max: 9
+      max: 10
       tick_jump: 1
       hline:
         -
@@ -192,15 +192,15 @@ mrlm:
   wind_gust:
     contour_map:
       min: 10
-      max: 30
-      ticks_num: 8
+      max: 20
+      ticks_num: 6
     time_series:
       min: 10
-      max: 30
-      tick_jump: 3
+      max: 20
+      tick_jump: 2
       hline:
-        -
-
+        - 
+  
   temperature:
     contour_map:
       min: 21
@@ -208,7 +208,7 @@ mrlm:
       ticks_num: 11
     time_series:
       min: 20
-      max: 31
+      max: 33
       tick_jump: 2
       hline:
         -
@@ -216,19 +216,19 @@ mrlm:
   dewpoint:
     contour_map:
       min: 20
-      max: 25
-      ticks_num: 6
-    time_series:
-      min: 20
       max: 26
-      tick_jump: 1
+      ticks_num: 7
+    time_series:
+      min: 18
+      max: 27
+      tick_jump: 2
       hline:
         -
 
   pressure:
     contour_map:
       min: 29.76
-      max: 30.00
+      max: 30.01
       ticks_num: 0.02
     time_series:
       min: 29.76
@@ -260,8 +260,8 @@ mrpv:
   wind_speed:
     contour_map:
       min: 2
-      max: 20
-      ticks_num: 10
+      max: 18
+      ticks_num: 9
     time_series:
       min: 3
       max: 19
@@ -283,11 +283,11 @@ mrpv:
 
   temperature:
     contour_map:
-      min: 14
+      min: 16
       max: 28
-      ticks_num: 8
+      ticks_num: 7
     time_series:
-      min: 14
+      min: 16
       max: 29
       tick_jump: 2
       hline:
@@ -296,11 +296,11 @@ mrpv:
   dewpoint:
     contour_map:
       min: 12
-      max: 22
-      ticks_num: 6
+      max: 20
+      ticks_num: 5
     time_series:
       min: 12
-      max: 24
+      max: 22
       tick_jump: 2
       hline:
         -
@@ -315,4 +315,4 @@ mrpv:
       max: 30.09
       tick_jump: 0.02
       hline:
-        -
+        - 

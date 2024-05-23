@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from clima.graphics import DAYS_PER_MONTH, MONTHS, hours_range, local_time_list, dpi
+from clima.graphics import DAYS_PER_MONTH, MONTHS, hours_range, local_time_list
 from clima.logger_model import logger
 
 time_ranges = {19: 9, 13: 6, 24: 12}
@@ -108,14 +108,14 @@ def barfrec_plot(
         )
     frecs = 100 * month_means / len(DAYS_PER_MONTH[month])
 
-    sns.set()
+    sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
     bars = sns.barplot(
         x=months - 1, y=month_means, color="royalblue", ax=ax, label=bp_label
     )
-    ax.set(ylabel="No. de días con ocurrencia de fenomeno")
-    ax.set_xlabel(None)
-    ax_hanldes, ax_labels = ax.get_legend_handles_labels()
+    ax.set(ylabel="No. de días con ocurrencia de fenomeno", xlabel="Mes")
+    # ax.set_xlabel(None)
+    ax_handles, ax_labels = ax.get_legend_handles_labels()
     ax2 = ax.twinx()
     ax2.set(
         ylabel="Frecuencia de ocurrencia %",
@@ -134,13 +134,20 @@ def barfrec_plot(
         lw=5,
         label="Frecuencias",
     )
-    ax2_hanldes, ax2_labels = ax2.get_legend_handles_labels()
-    all_handles = ax_hanldes + ax2_hanldes
+    ax2_handles, ax2_labels = ax2.get_legend_handles_labels()
+    all_handles = ax_handles + ax2_handles
     ax.set_yticks(np.arange(0, 31, 5))
     ax2.set_yticks(np.arange(0, 101, 10))
     ax.set_xticklabels([m[:3].upper() for m in MONTHS])
-    sns.set()
-    ax2.legend(handles=all_handles, loc="upper left", framealpha=0.9)
+    sns.set_theme()
+    ax2.legend(handles=ax2_handles, loc="upper left", framealpha=0.9)
+    
+    plt.subplots_adjust(
+        bottom=0.1,
+        top=0.95,
+        left=0.1,
+        right=0.9,
+    )
 
     logger.info(f"Saving bar-frecuencies plot figure for variable {variable}.")
     fig.savefig(
@@ -186,12 +193,13 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=
 
         means[index] = Decimal(mean).quantize(Decimal("1."), ROUND_HALF_UP)
 
-    sns.set()
+    sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
     bars = sns.barplot(x=np.arange(0, len(hours)), y=means, color="royalblue", ax=ax)
     ax.set_yticks(np.arange(0, 31, 5))
-    ax.set_xticklabels(local_time_list(hours))
+    ax.set_xlabel("Hora de operación")
     ax.set_ylabel("No. de días con ocurrencia de fenómeno")
+    ax.set_xticklabels(local_time_list(hours))
 
     if station in ["mroc", "mrlb"]:
         plt.xticks(rotation=90)
@@ -201,13 +209,18 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=
         if weather != ""
         else "."
     )
+    plt.subplots_adjust(
+        bottom=0.15,
+        top=0.96,
+        left=0.1,
+        right=0.95,
+    )
     fig.savefig(
         f"template/Figures/graphs/bar_plot_{save_as}.png", format="png", dpi=dpi
     )
 
 
-def all_weather_bar_plot(df: pd.DataFrame, station: str):
-    # hours = hours_range(station)
+def all_weather_bar_plot(df: pd.DataFrame):
     means_dz = np.arange(12)
     means_ra = np.arange(12)
     means_sh = np.arange(12)
@@ -288,7 +301,7 @@ def all_weather_bar_plot(df: pd.DataFrame, station: str):
         means_obsc_per_month, columns=["month", "mean", "weather"]
     )
 
-    sns.set()
+    sns.set_theme()
     g = sns.catplot(
         x="month",
         y="mean",
@@ -300,7 +313,7 @@ def all_weather_bar_plot(df: pd.DataFrame, station: str):
         aspect=10 / 6,
         palette="rainbow",
     )
-    plt.xlabel("")
+    plt.xlabel("Mes")
     plt.ylabel("Número de ocurrencias", fontsize=14)
     plt.legend(framealpha=0.6)
 
@@ -323,7 +336,7 @@ def all_weather_bar_plot(df: pd.DataFrame, station: str):
         aspect=10 / 6,
         palette="rainbow",
     )
-    plt.xlabel("")
+    plt.xlabel("Mes")
     plt.ylabel("Número de ocurrencias", fontsize=14)
     plt.legend(framealpha=0.6)
 
@@ -331,6 +344,6 @@ def all_weather_bar_plot(df: pd.DataFrame, station: str):
     plt.savefig(
         f"template/Figures/graphs/all_weather_barplot_obsc.png",
         format="png",
-        dpi=dpi,
+        dpi=600,
         bbox_inches="tight",
     )

@@ -6,7 +6,7 @@ import seaborn as sns
 
 from clima.graphics import DAYS_PER_MONTH, dpi
 from clima.graphics import MONTHS as months
-from clima.graphics import frange, hours_range, local_time_list
+from clima.graphics import dpi, frange, hours_range, local_time_list
 from clima.logger_model import logger
 
 
@@ -28,7 +28,7 @@ def time_series(
     save_as="",
     config={"min": 0, "max": 260, "tick_jump": 50, "hline": [5, 6, 8, 9, 10]},
 ):
-    sns.set()
+    sns.set_theme()
     fig, _axs = plt.subplots(figsize=(16, 18), nrows=4, ncols=3)
     axs = _axs.flatten()
 
@@ -92,7 +92,8 @@ def time_series(
         #     list(frange(config["min"], config["max"], config["tick_jump"]))
         # )
         axs[ax_i].set_yticks(
-            np.arange(config["min"], config["max"], config["tick_jump"]))
+            np.arange(config["min"], config["max"], config["tick_jump"])
+        )
         # axs[ax_i].set_yticks(
         #     [x for x in range(config["min"], config["max"], config["tick_jump"])]
         # )
@@ -110,9 +111,15 @@ def time_series(
                     for hour in local_time_list(reduce_list(hours))
                 ]
             )
+            axs[ax_i].set_xlabel("Hora de operación")
 
     fig.subplots_adjust(
-        bottom=0.05, top=0.95, left=0.08, right=0.95, wspace=0.2, hspace=0.2
+        bottom=0.05,
+        top=0.97,
+        left=0.08,
+        right=0.95,
+        wspace=0.2,
+        hspace=0.25,
     )
 
     logger.info(f"Saving time series figure for variable {variable}.")
@@ -130,11 +137,12 @@ def single_time_series(df: pd.DataFrame, variable: str, yaxis_label="", save_as=
         month_df = df.query(f"Month == {j}")
         month_means[i] = month_df[variable].mean()
 
-    sns.set()
+    sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
     im = sns.lineplot(x=range(12), y=month_means, ax=ax)
     im.set_xticks(list(range(12)))
     im.set_xticklabels([m[0:3].upper() for m in months])
+    im.set_xlabel("Mes")
     im.set_ylabel(yaxis_label)
 
     logger.info(f"Saving single time series figure for variable {variable}.")

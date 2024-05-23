@@ -7,7 +7,7 @@ from clima.graphics import MONTHS
 from clima.graphics import dpi, hours_range, local_time_list
 from clima.logger_model import logger
 
-months = list(MONTHS)
+months = [month[0:3].upper() for month in MONTHS]
 
 
 def _cardinal_point(value: float):
@@ -76,8 +76,18 @@ def heat_map(df: pd.DataFrame, station: str):
         xticklabels=hours_labels,
         cbar_kws={"label": "Dirección del viento (°)"},
     )
-    fig.subplots_adjust(
-        bottom=0.1, top=0.94, left=0.1, right=0.98, wspace=0.1, hspace=0.1
+    ax.set_xlabel("Hora de operación")
+    ax.set_ylabel("Mes")
+    
+    if station.upper() in ["MROC", "MRLB"]:
+        plt.xticks(rotation=45)
+
+    plt.yticks(rotation=0)
+    plt.subplots_adjust(
+        bottom=0.12,
+        top=0.94,
+        left=0.1,
+        right=1.0,
     )
 
     logger.info(f"Saving heat map figure for wind direction.")

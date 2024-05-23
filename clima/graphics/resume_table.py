@@ -171,8 +171,7 @@ def _generate_climogram(station: str, data: list):
         ax=ax,
         label="Precipitación",
     )
-    ax.set(ylabel="Precipitación (mm)")
-    ax.set_xlabel(None)
+    ax.set(ylabel="Precipitación (mm)", xlabel="Mes")
     ax_hanldes, ax_labels = ax.get_legend_handles_labels()
     # ax.legend(loc="upper left")
     ax2 = ax.twinx()
@@ -203,6 +202,12 @@ def _generate_climogram(station: str, data: list):
     ax2_hanldes, ax2_labels = ax2.get_legend_handles_labels()
     all_handles = ax_hanldes + ax2_hanldes
     ax.set_xticklabels([lab[:3].upper() for lab in df["Mes"].tolist()])
+    plt.subplots_adjust(
+        bottom=0.1,
+        top=0.95,
+        left=0.1,
+        right=0.90,
+    )
     sns.set()
     ax2.legend(handles=all_handles, loc="upper left", framealpha=0.9)
     # ax.tick_params(axis='y')
@@ -240,9 +245,9 @@ LATEX_FOOTER = """
 def generate_table(station: str):
     station = station.lower()
     logger.info("Reading data from CSV files.")
-    prec = pd.read_csv(f"data/{station}/{station}_prec.csv")
-    tmax = pd.read_csv(f"data/{station}/{station}_max.csv")
-    tmin = pd.read_csv(f"data/{station}/{station}_min.csv")
+    prec = pd.read_csv(f"data/{station}/pcp.csv")
+    tmax = pd.read_csv(f"data/{station}/tmax.csv")
+    tmin = pd.read_csv(f"data/{station}/tmin.csv")
 
     prec_data = _handle_precipitation(prec)
     tmax_data = _handle_tmax(tmax)
