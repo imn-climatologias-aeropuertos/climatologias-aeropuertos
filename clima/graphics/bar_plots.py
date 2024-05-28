@@ -1,3 +1,5 @@
+import re
+
 from decimal import ROUND_HALF_UP, Decimal
 
 import matplotlib.pyplot as plt
@@ -114,12 +116,16 @@ def barfrec_plot(
     bars = sns.barplot(
         x=months - 1, y=month_means, color="royalblue", ax=ax, label=bp_label
     )
-    ax.set(ylabel="No. de días con ocurrencia de fenomeno", xlabel="Mes")
+    if re.match(r"^(Visibilidad|Tormenta).+", bp_label):
+        ax.set_ylabel(f"No. de ocurrencias {bp_label}", size=16)
+    else:
+        ax.set_ylabel(f"Número de ocurrencias de {bp_label}", size=16)
+    ax.set_xlabel("Mes", size=16)
     # ax.set_xlabel(None)
     ax_handles, ax_labels = ax.get_legend_handles_labels()
     ax2 = ax.twinx()
+    ax2.set_ylabel("Frecuencia de ocurrencia %", size=16)
     ax2.set(
-        ylabel="Frecuencia de ocurrencia %",
         ylim=(
             int(frecs.min() - 5) if int(frecs.min() - 5) > 0 else 0,
             int(frecs.max() + 5) if int(frecs.max() + 5) <= 100 else 100,
@@ -136,12 +142,13 @@ def barfrec_plot(
         label="Frecuencias",
     )
     ax2_handles, ax2_labels = ax2.get_legend_handles_labels()
-    all_handles = ax_handles + ax2_handles
-    ax.set_yticks(np.arange(0, 31, 5))
-    ax2.set_yticks(np.arange(0, 101, 10))
+    #all_handles = ax_handles + ax2_handles
+    #ax.set_yticks(np.arange(0, 31, 5))
+    #ax2.set_yticks(np.arange(0, 101, 10))
     ax.set_xticklabels([m[:3].upper() for m in MONTHS])
+    ax.legend(loc="upper left", framealpha=0.9)
     sns.set_theme()
-    ax2.legend(handles=ax2_handles, loc="upper left", framealpha=0.9)
+    ax2.legend(loc="upper right", framealpha=0.9)
     
     plt.subplots_adjust(
         bottom=0.1,
@@ -152,11 +159,11 @@ def barfrec_plot(
 
     logger.info(f"Saving bar-frecuencies plot figure for variable {variable}.")
     fig.savefig(
-        f"template/Figures/graphs/barfrec_plot_{save_as}.png", format="png", dpi=dpi
+        f"template/Figures/graphs/barfrec_plot_{save_as}.jpg", format="jpg", dpi=dpi
     )
 
 
-def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=""):
+def bar_plot(df: pd.DataFrame, station: str, variable: str, bp_label= "", weather="", save_as=""):
     hours = hours_range(station)
     means = np.arange(len(hours))
     years = df["Year"].unique()
@@ -197,9 +204,12 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=
     sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
     bars = sns.barplot(x=np.arange(0, len(hours)), y=means, color="royalblue", ax=ax)
-    ax.set_yticks(np.arange(0, 31, 5))
-    ax.set_xlabel("Hora de operación")
-    ax.set_ylabel("No. de días con ocurrencia de fenómeno")
+    #ax.set_yticks(np.arange(0, 31, 5))
+    ax.set_xlabel("Hora", size=16)
+    if bp_label:
+        ax.set_ylabel(f"Número de ocurrencias de {bp_label}", size=16)
+    else:
+        ax.set_ylabel(f"Número de ocurrencias", size=16)
     ax.set_xticklabels(local_time_list(hours))
 
     if station in ["mroc", "mrlb"]:
@@ -217,7 +227,7 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, weather="", save_as=
         right=0.95,
     )
     fig.savefig(
-        f"template/Figures/graphs/bar_plot_{save_as}.png", format="png", dpi=dpi
+        f"template/Figures/graphs/bar_plot_{save_as}.jpg", format="jpg", dpi=dpi
     )
 
 
@@ -314,14 +324,14 @@ def all_weather_bar_plot(df: pd.DataFrame):
         aspect=10 / 6,
         palette="rainbow",
     )
-    plt.xlabel("Mes")
-    plt.ylabel("Número de ocurrencias", fontsize=14)
+    plt.xlabel("Mes", fontsize=16)
+    plt.ylabel("Número de ocurrencias", fontsize=16)
     plt.legend(framealpha=0.6)
 
     logger.info(f"Saving bar plot figure for variable for all weather: precipitations.")
     plt.savefig(
-        f"template/Figures/graphs/all_weather_barplot_prec.png",
-        format="png",
+        f"template/Figures/graphs/all_weather_barplot_prec.jpg",
+        format="jpg",
         dpi=dpi,
         bbox_inches="tight",
     )
@@ -343,8 +353,8 @@ def all_weather_bar_plot(df: pd.DataFrame):
 
     logger.info(f"Saving bar plot figure for variable for all weather: obscurations.")
     plt.savefig(
-        f"template/Figures/graphs/all_weather_barplot_obsc.png",
-        format="png",
+        f"template/Figures/graphs/all_weather_barplot_obsc.jpg",
+        format="jpg",
         dpi=dpi,
         bbox_inches="tight",
     )
@@ -431,14 +441,14 @@ def gusts_bar_plot(df: pd.DataFrame):
         aspect=10 / 6,
         palette="rainbow",
     )
-    plt.xlabel("Mes")
-    plt.ylabel("Número de ocurrencias", fontsize=14)
+    plt.xlabel("Mes", fontsize=16)
+    plt.ylabel("No. de ocurrencias de ráfagas de viento (kt)", fontsize=16)
     plt.legend(framealpha=0.6)
 
     logger.info(f"Saving bar plot figure for variable for gusts.")
     plt.savefig(
-        f"template/Figures/graphs/gusts_barplot.png",
-        format="png",
+        f"template/Figures/graphs/gusts_barplot.jpg",
+        format="jpg",
         dpi=dpi,
         bbox_inches="tight",
     )

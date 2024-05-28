@@ -11,7 +11,7 @@ from .graphics.bar_plots import (
 )
 from .graphics.contour_map import contour_map
 from .graphics.resume_table import generate_table
-from .graphics.time_series import single_time_series, time_series
+from .graphics.time_series import single_time_series, time_series, single_time_series_by_hour
 from .graphics.wind_direction import heat_map
 
 f = open("logging.log", "w")
@@ -78,6 +78,7 @@ def wind_direction(ctx):
         config=config["time_series"],
     )
     single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
+    single_time_series_by_hour(df, station, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
 
 
 @cli.command()
@@ -109,6 +110,7 @@ def wind_speed(ctx):
         config=config["time_series"],
     )
     single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
+    single_time_series_by_hour(df, station, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
 
 
 @cli.command()
@@ -123,23 +125,24 @@ def wind_gust(ctx):
     df = ctx.obj["data"][columns]
     label = "Ráfagas de viento (kt)"
 
-    contour_map(
-        df,
-        station,
-        columns[-1],
-        cbar_label=label,
-        save_as=columns[-1].lower(),
-        config=config["contour_map"],
-    )
-    time_series(
-        df,
-        station,
-        columns[-1],
-        yaxis_label=label,
-        save_as=columns[-1].lower(),
-        config=config["time_series"],
-    )
-    single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
+    # contour_map(
+    #     df,
+    #     station,
+    #     columns[-1],
+    #     cbar_label=label,
+    #     save_as=columns[-1].lower(),
+    #     config=config["contour_map"],
+    # )
+    # time_series(
+    #     df,
+    #     station,
+    #     columns[-1],
+    #     yaxis_label=label,
+    #     save_as=columns[-1].lower(),
+    #     config=config["time_series"],
+    # )
+    # single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
+    # single_time_series_by_hour(df, station, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
     gusts_bar_plot(df)
 
 
@@ -153,7 +156,7 @@ def temperature(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Temperatura absoluta (°C)"
+    label = "Temperatura (°C)"
 
     contour_map(
         df,
@@ -172,6 +175,7 @@ def temperature(ctx):
         config=config["time_series"],
     )
     single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
+    single_time_series_by_hour(df, station, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
 
 
 @cli.command()
@@ -203,6 +207,7 @@ def dewpoint(ctx):
         config=config["time_series"],
     )
     single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
+    single_time_series_by_hour(df, station, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
 
 
 @cli.command()
@@ -234,6 +239,7 @@ def pressure(ctx):
         config=config["time_series"],
     )
     single_time_series(df, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
+    single_time_series_by_hour(df, station, columns[-1], yaxis_label=label, save_as=columns[-1].lower())
 
 
 @cli.command()
@@ -249,11 +255,11 @@ def visibility(ctx):
         df,
         station,
         "Visibility",
-        bp_label="Visibilidad reinante < 5000.0 m",
+        bp_label="Visibilidad < 5000.0 m",
         save_as="visibility",
     )
-    bar_plot(df, station, "Cavok", save_as="cavok")
-    bar_plot(df, station, "Visibility", save_as="visibility")
+    bar_plot(df, station, "Cavok", save_as="cavok", bp_label="CAVOK")
+    bar_plot(df, station, "Visibility", save_as="visibility", bp_label="Visibilidad < 5000 m")
 
 
 @cli.command()
@@ -279,7 +285,7 @@ def weather(ctx):
         station,
         "Weather_description",
         weather="SH",
-        bp_label="Chubascos de lluvia (SHRA)",
+        bp_label="Chubascos (SHRA)",
         save_as="shra",
     )
     barfrec_plot(
@@ -354,7 +360,7 @@ def ceiling(ctx):
         df,
         station,
         "Sky_layer_height",
-        bp_label="Techo de nubes < 1500 ft",
+        bp_label="Techo < 1500 ft",
         save_as="ceiling",
     )
     bar_plot(df, station, "Sky_layer_height", save_as="ceiling")

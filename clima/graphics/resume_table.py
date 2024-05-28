@@ -169,14 +169,15 @@ def _generate_climogram(station: str, data: list):
         data=df,
         color="royalblue",
         ax=ax,
-        label="Precipitación",
+        label="Precipitación (mm)",
     )
-    ax.set(ylabel="Precipitación (mm)", xlabel="Mes")
+    ax.set_xlabel("Mes", size=16)
+    ax.set_ylabel("Precipitación (mm)", size=16)
     ax_hanldes, ax_labels = ax.get_legend_handles_labels()
     # ax.legend(loc="upper left")
     ax2 = ax.twinx()
+    ax2.set_ylabel("Temperatura (°C)", size=16)
     ax2.set(
-        ylabel="Temperatura (°C)",
         ylim=(int(df["Tmin_media"].min() - 3), int(df["Tmax_media"].max()) + 3),
     )
     ax2.grid(False)
@@ -188,7 +189,7 @@ def _generate_climogram(station: str, data: list):
         color="red",
         ax=ax2,
         lw=5,
-        label="Temperatura máxima",
+        label="Temperatura máxima (°C)",
     )
     tmin = sns.lineplot(
         x="Mes",
@@ -197,7 +198,7 @@ def _generate_climogram(station: str, data: list):
         color="blue",
         ax=ax2,
         lw=5,
-        label="Temperatura mínima",
+        label="Temperatura mínima (°C)",
     )
     ax2_hanldes, ax2_labels = ax2.get_legend_handles_labels()
     all_handles = ax_hanldes + ax2_hanldes
@@ -209,9 +210,9 @@ def _generate_climogram(station: str, data: list):
         right=0.90,
     )
     sns.set()
-    ax2.legend(handles=all_handles, loc="upper left", framealpha=0.9)
+    ax2.legend(handles=ax2_hanldes, loc="upper left", framealpha=0.9)
     # ax.tick_params(axis='y')
-    fig.savefig("template/Figures/graphs/climograma.png", format="png", dpi=dpi)
+    fig.savefig("template/Figures/graphs/climograma.jpg", format="jpg", dpi=dpi)
 
 
 LATEX_HEADER = """

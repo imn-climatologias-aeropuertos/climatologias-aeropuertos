@@ -38,7 +38,7 @@ def frange(start, stop, step):
         start = float(start)
 
 
-dpi = 75
+dpi = 150
 
 
 MONTHS = [

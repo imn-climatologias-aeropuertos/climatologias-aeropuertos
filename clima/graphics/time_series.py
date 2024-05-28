@@ -87,7 +87,7 @@ def time_series(
         axs[ax_i].set_title(month, weight="bold", size=16)
         axs[ax_i].set_xticks(reduce_list(list(hours_array)))
         axs[ax_i].set_xlabel("")
-        axs[ax_i].set_ylabel(yaxis_label, size=16)
+        axs[ax_i].set_ylabel(yaxis_label)
         # axs[ax_i].set_yticks(
         #     list(frange(config["min"], config["max"], config["tick_jump"]))
         # )
@@ -111,7 +111,7 @@ def time_series(
                     for hour in local_time_list(reduce_list(hours))
                 ]
             )
-            axs[ax_i].set_xlabel("Hora de operación")
+            axs[ax_i].set_xlabel("Hora")
 
     fig.subplots_adjust(
         bottom=0.05,
@@ -124,7 +124,7 @@ def time_series(
 
     logger.info(f"Saving time series figure for variable {variable}.")
     fig.savefig(
-        f"template/Figures/graphs/time_series_{save_as}.png", format="png", dpi=dpi
+        f"template/Figures/graphs/time_series_{save_as}.jpg", format="jpg", dpi=dpi
     )
 
 
@@ -142,12 +142,51 @@ def single_time_series(df: pd.DataFrame, variable: str, yaxis_label="", save_as=
     im = sns.lineplot(x=range(12), y=month_means, ax=ax)
     im.set_xticks(list(range(12)))
     im.set_xticklabels([m[0:3].upper() for m in months])
-    im.set_xlabel("Mes")
-    im.set_ylabel(yaxis_label)
+    im.set_xlabel("Mes", size=16)
+    im.set_ylabel(yaxis_label, size=16)
 
     logger.info(f"Saving single time series figure for variable {variable}.")
     fig.savefig(
-        f"template/Figures/graphs/single_time_series_{save_as}.png",
-        format="png",
+        f"template/Figures/graphs/single_time_series_{save_as}.jpg",
+        format="jpg",
+        dpi=dpi,
+    )
+
+def single_time_series_by_hour(df: pd.DataFrame, station: str, variable: str, yaxis_label="", save_as=""):
+
+    hours = hours_range(station)
+    hours_length = len(hours)
+    hour_means = np.zeros(hours_length)
+    if station == "mroc":
+        hours_array = np.array([hours.index(x) + 1 for x in hours])
+    else:
+        hours_array = np.array([hours.index(x) + 6 for x in hours])
+
+    logger.info(f"Extracting data for single time series (hourly) for {variable}.")
+    for i in range(hours_length):
+        hour_df = df.query(f"Hour1_24 == {hours[i]}")
+        hour_means[i] = hour_df[variable].mean()
+
+    sns.set_theme()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    im = sns.lineplot(x=range(hours_length), y=hour_means, ax=ax)
+    im.set_xticks(list(range(hours_length)))
+    im.set_xticklabels(local_time_list(hours))
+    im.set_xlabel("Hora", size=16)
+    im.set_ylabel(yaxis_label, size=16)
+    
+    if station.upper() in ["MROC", "MRLB"]:
+        plt.xticks(rotation=45)
+    fig.subplots_adjust(
+        bottom=0.15,
+        top=0.97,
+        left=0.12,
+        right=0.95,
+    )
+
+    logger.info(f"Saving single time series (hourly) figure for variable {variable}.")
+    fig.savefig(
+        f"template/Figures/graphs/single_time_series_hourly_{save_as}.jpg",
+        format="jpg",
         dpi=dpi,
     )

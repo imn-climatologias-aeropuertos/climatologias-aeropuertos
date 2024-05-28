@@ -74,10 +74,11 @@ def heat_map(df: pd.DataFrame, station: str):
         cmap=cmap,
         yticklabels=months,
         xticklabels=hours_labels,
-        cbar_kws={"label": "Dirección del viento (°)"},
     )
-    ax.set_xlabel("Hora de operación")
-    ax.set_ylabel("Mes")
+    ax.set_xlabel("Hora", size=16)
+    ax.set_ylabel("Mes", size=16)
+    cbar = ax.collections[0].colorbar
+    cbar.set_label("Dirección del viento (°)", size=16)
     
     if station.upper() in ["MROC", "MRLB"]:
         plt.xticks(rotation=45)
@@ -91,4 +92,4 @@ def heat_map(df: pd.DataFrame, station: str):
     )
 
     logger.info(f"Saving heat map figure for wind direction.")
-    fig.savefig(f"template/Figures/graphs/heatmap_wind_dir.png", format="png", dpi=dpi)
+    fig.savefig(f"template/Figures/graphs/heatmap_wind_dir.jpg", format="jpg", dpi=dpi)
