@@ -299,60 +299,113 @@ def weather(ctx):
 
     df = ctx.obj["data"][columns]
 
+    shra_label = "Chubascos (SHRA)"
     barfrec_plot(
         df,
         station,
         "Weather_description",
         weather="SH",
-        bp_label="Chubascos (SHRA)",
+        bp_label=shra_label,
         save_as="shra",
     )
+    bar_plot(
+        df,
+        station,
+        "Weather_description",
+        weather="SH",
+        save_as="sh",
+        bp_label=shra_label,
+    )
+
+    tsra_label = "Tormenta eléctrica (TS ó TSRA)"
     barfrec_plot(
         df,
         station,
         "Weather_description",
         weather="TS",
-        bp_label="Tormenta eléctrica (TS ó TSRA)",
+        bp_label=tsra_label,
         save_as="tsra",
     )
+    bar_plot(
+        df,
+        station,
+        "Weather_description",
+        weather="TS",
+        save_as="ts",
+        bp_label=tsra_label,
+    )
+
+    ra_label = "Lluvia (RA)"
     barfrec_plot(
         df,
         station,
         "Weather_precipitation",
         weather="RA",
-        bp_label="Lluvia (RA)",
+        bp_label=ra_label,
         save_as="ra",
     )
+    bar_plot(
+        df,
+        station,
+        "Weather_precipitation",
+        weather="RA",
+        save_as="ra",
+        bp_label=ra_label,
+    )
+
+    dz_label = "Llovizna (DZ)"
     barfrec_plot(
         df,
         station,
         "Weather_precipitation",
         weather="DZ",
-        bp_label="Llovizna (DZ)",
+        bp_label=dz_label,
         save_as="dz",
     )
+    bar_plot(
+        df,
+        station,
+        "Weather_precipitation",
+        weather="DZ",
+        save_as="dz",
+        bp_label=dz_label,
+    )
+
+    br_label = "Neblina (BR)"
     barfrec_plot(
         df,
         station,
         "Weather_obscuration",
         weather="BR",
-        bp_label="Neblina (BR)",
+        bp_label=br_label,
         save_as="br",
     )
+    bar_plot(
+        df,
+        station,
+        "Weather_obscuration",
+        weather="BR",
+        save_as="br",
+        bp_label=br_label,
+    )
+
+    fg_label = "Niebla (FG)"
     barfrec_plot(
         df,
         station,
         "Weather_obscuration",
         weather="FG",
-        bp_label="Niebla (FG)",
+        bp_label=fg_label,
         save_as="fg",
     )
-    bar_plot(df, station, "Weather_description", weather="SH", save_as="sh")
-    bar_plot(df, station, "Weather_description", weather="TS", save_as="ts")
-    bar_plot(df, station, "Weather_precipitation", weather="RA", save_as="ra")
-    bar_plot(df, station, "Weather_precipitation", weather="DZ", save_as="dz")
-    bar_plot(df, station, "Weather_obscuration", weather="FG", save_as="fg")
-    bar_plot(df, station, "Weather_obscuration", weather="BR", save_as="br")
+    bar_plot(
+        df,
+        station,
+        "Weather_obscuration",
+        weather="FG",
+        save_as="fg",
+        bp_label=fg_label,
+    )
 
     all_weather_bar_plot(df)
 

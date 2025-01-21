@@ -142,20 +142,22 @@ def barfrec_plot(
         label="Frecuencias",
     )
     ax2_handles, ax2_labels = ax2.get_legend_handles_labels()
-    #all_handles = ax_handles + ax2_handles
-    #ax.set_yticks(np.arange(0, 31, 5))
-    #ax2.set_yticks(np.arange(0, 101, 10))
+    # all_handles = ax_handles + ax2_handles
+    # ax.set_yticks(np.arange(0, 31, 5))
+    # ax2.set_yticks(np.arange(0, 101, 10))
     ax.set_xticklabels([m[:3].upper() for m in MONTHS])
     ax.legend(loc="upper left", framealpha=0.9)
     sns.set_theme()
     ax2.legend(loc="upper right", framealpha=0.9)
-    
+
     plt.subplots_adjust(
         bottom=0.1,
-        top=0.95,
+        top=0.93,
         left=0.1,
         right=0.9,
     )
+
+    ax.set_title(f"Distribución mensual de ocurrencias de {bp_label}", size=18)
 
     logger.info(f"Saving bar-frecuencies plot figure for variable {variable}.")
     fig.savefig(
@@ -163,7 +165,9 @@ def barfrec_plot(
     )
 
 
-def bar_plot(df: pd.DataFrame, station: str, variable: str, bp_label= "", weather="", save_as=""):
+def bar_plot(
+    df: pd.DataFrame, station: str, variable: str, bp_label="", weather="", save_as=""
+):
     hours = hours_range(station)
     means = np.arange(len(hours))
     years = df["Year"].unique()
@@ -204,8 +208,8 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, bp_label= "", weathe
     sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
     bars = sns.barplot(x=np.arange(0, len(hours)), y=means, color="royalblue", ax=ax)
-    #ax.set_yticks(np.arange(0, 31, 5))
-    ax.set_xlabel("Hora", size=16)
+    # ax.set_yticks(np.arange(0, 31, 5))
+    ax.set_xlabel("Hora local", size=16)
     if bp_label:
         ax.set_ylabel(f"Número de ocurrencias de {bp_label}", size=16)
     else:
@@ -222,10 +226,12 @@ def bar_plot(df: pd.DataFrame, station: str, variable: str, bp_label= "", weathe
     )
     plt.subplots_adjust(
         bottom=0.15,
-        top=0.96,
+        top=0.94,
         left=0.1,
         right=0.95,
     )
+
+    ax.set_title(f"Distribución horaria de ocurrencias de {bp_label}", size=18)
     fig.savefig(
         f"template/Figures/graphs/bar_plot_{save_as}.jpg", format="jpg", dpi=dpi
     )
@@ -325,8 +331,12 @@ def all_weather_bar_plot(df: pd.DataFrame):
         palette="rainbow",
     )
     plt.xlabel("Mes", fontsize=16)
-    plt.ylabel("Número de ocurrencias", fontsize=16)
+    plt.ylabel("Número de ocurrencias de precipitación", fontsize=16)
     plt.legend(framealpha=0.6)
+    plt.title(
+        "Distribución mensual de ocurrencias de fenómenos de precipitación",
+        size=18,
+    )
 
     logger.info(f"Saving bar plot figure for variable for all weather: precipitations.")
     plt.savefig(
@@ -347,9 +357,13 @@ def all_weather_bar_plot(df: pd.DataFrame):
         aspect=10 / 6,
         palette="rainbow",
     )
-    plt.xlabel("Mes")
-    plt.ylabel("Número de ocurrencias", fontsize=14)
+    plt.xlabel("Mes", fontsize=16)
+    plt.ylabel("Número de ocurrencias de niebla y neblina", fontsize=16)
     plt.legend(framealpha=0.6)
+    plt.title(
+        "Distribución mensual de ocurrencias de fenómenos de oscurecimiento",
+        size=18,
+    )
 
     logger.info(f"Saving bar plot figure for variable for all weather: obscurations.")
     plt.savefig(
