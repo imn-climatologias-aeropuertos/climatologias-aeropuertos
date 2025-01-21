@@ -205,12 +205,13 @@ def _generate_climogram(station: str, data: list):
     ax.set_xticklabels([lab[:3].upper() for lab in df["Mes"].tolist()])
     plt.subplots_adjust(
         bottom=0.1,
-        top=0.95,
+        top=0.93,
         left=0.1,
         right=0.90,
     )
     sns.set()
     ax2.legend(handles=ax2_hanldes, loc="upper left", framealpha=0.9)
+    ax2.set_title("Climograma", size=18)
     # ax.tick_params(axis='y')
     fig.savefig("template/Figures/graphs/climograma.jpg", format="jpg", dpi=dpi)
 
