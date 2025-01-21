@@ -1,4 +1,4 @@
-STATION=mrlb
+STATION=mroc
 
 SOURCE_FILES=$(shell find . -path "./clima/*.py")
 TEST_FILES=$(shell find . -path "./test/*.py")
@@ -41,14 +41,34 @@ lint:
 tests:
 	PYTHONPATH=. $(POETRY_RUN) pytest -vv test
 
-run:
-	# python -m clima $(STATION) resume-table
-	# python -m clima $(STATION) wind-direction
-	# python -m clima $(STATION) wind-speed
+run-all: resume-table wind-dir wind-spd wind-gust temp dewpt press vis weather ceiling
+
+resume-table:
+	python -m clima $(STATION) resume-table
+
+wind-dir:
+	python -m clima $(STATION) wind-direction
+
+wind-spd:
+	python -m clima $(STATION) wind-speed
+
+wind-gust:
 	python -m clima $(STATION) wind-gust
+
+temp:
 	python -m clima $(STATION) temperature
-	# python -m clima $(STATION) dewpoint
-	# python -m clima $(STATION) pressure
-	# python -m clima $(STATION) visibility
-	# python -m clima $(STATION) weather
-	# python -m clima $(STATION) ceiling
+
+dewpt:
+	python -m clima $(STATION) dewpoint
+
+press:
+	python -m clima $(STATION) pressure
+
+vis:
+	python -m clima $(STATION) visibility
+
+weather:
+	python -m clima $(STATION) weather
+
+ceiling:
+	python -m clima $(STATION) ceiling

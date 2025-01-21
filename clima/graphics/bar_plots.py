@@ -419,7 +419,7 @@ def gusts_bar_plot(df: pd.DataFrame):
     logger.info(f"Creating DataFrame for gusts bar plots.")
     for arr, weather in zip(
         [gust_19, gust_29, gust_39, gust_40],
-        ["19 kt o menos", "20-29 kt", "30-39 kt", "40 kt o más"],
+        ["19 Kt o menos", "20-29 Kt", "30-39 Kt", "40 Kt o más"],
     ):
         for i, m in enumerate(months_abbr):
             row = [m, arr[i], weather]
@@ -442,7 +442,7 @@ def gusts_bar_plot(df: pd.DataFrame):
         palette="rainbow",
     )
     plt.xlabel("Mes", fontsize=16)
-    plt.ylabel("No. de ocurrencias de ráfagas de viento (kt)", fontsize=16)
+    plt.ylabel("No. de ocurrencias de ráfagas de viento (Kt)", fontsize=16)
     plt.legend(framealpha=0.6)
 
     logger.info(f"Saving bar plot figure for variable for gusts.")

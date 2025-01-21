@@ -68,11 +68,14 @@ def contour_map(
         axs[i - 1].set_yticks(list(hours_array))
 
         # yticklabels hidden for more right plots
-        if i in [1, 4, 7, 10]:
-            axs[i - 1].set_yticklabels(local_time_list(hours))
-            axs[i -1].set_ylabel("Hora", size=16)
-        else:
-            axs[i - 1].set_yticklabels([])
+        # if i in [1, 4, 7, 10]:
+        #     axs[i - 1].set_yticklabels(local_time_list(hours))
+        #     axs[i -1].set_ylabel("Hora", size=16)
+        # else:
+        #     axs[i - 1].set_yticklabels([])
+            
+        axs[i - 1].set_yticklabels(local_time_list(hours))
+        axs[i -1].set_ylabel("Hora", size=16)
 
         # set the title for every plot (the month name)
         axs[i - 1].set_title(month, weight="bold", size=16)
@@ -99,7 +102,7 @@ def contour_map(
         top=0.97,
         left=0.1,
         right=0.8,
-        wspace=0.2,
+        wspace=0.25,
         hspace=0.25,
     )
 

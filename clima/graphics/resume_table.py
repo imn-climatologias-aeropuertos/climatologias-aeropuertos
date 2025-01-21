@@ -280,3 +280,48 @@ def generate_table(station: str):
     f.close()
 
     _generate_climogram(station, data[:-1])
+
+
+csv_header = [
+    "Mes",
+    "Temperatura máxima extrema (°C)",
+    "Temperatura mínima extrema (°C)",
+    "Temperatura máxima media (°C)",
+    "Temperatura mínima media (°C)",
+    "Precipitación total media (mm)",
+    "Media de días con precipitación",
+]
+
+
+def generate_csv(station: str):
+    station = station.lower()
+    logger.info("Reading data from CSV files.")
+    prec = pd.read_csv(f"data/{station}/pcp.csv")
+    tmax = pd.read_csv(f"data/{station}/tmax.csv")
+    tmin = pd.read_csv(f"data/{station}/tmin.csv")
+
+    prec_data = _handle_precipitation(prec)
+    tmax_data = _handle_tmax(tmax)
+    tmin_data = _handle_tmin(tmin)
+
+    data = []
+    csv_file = open("template/Figures/graphs/resume_table.csv", "w")
+    csv_file.write(",".join(csv_header) + "\n")
+    for m, tx, tn, pcp in zip(months, tmax_data, tmin_data, prec_data):
+        month_data = [
+            m,
+            str(tx[0]),
+            str(tn[0]),
+            str(tx[1]),
+            str(tn[1]),
+            str(pcp[0]),
+            str(pcp[1]),
+        ]
+
+        data.append(month_data)
+
+    for month_data in data[:-1]:
+        csv_file.write(",".join(month_data) + "\n")
+    csv_file.write(",".join(data[-1]) + "\n")
+
+    _generate_climogram(station, data[:-1])
