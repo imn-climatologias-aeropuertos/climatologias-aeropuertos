@@ -44,7 +44,9 @@ def heat_map(df: pd.DataFrame, station: str):
         cardinal_points_per_hour = []
 
         # For every hour, get the mean
-        logger.info(f"Getting the hourly DataFrames and calculating the means values for month: {month}.")
+        logger.info(
+            f"Getting the hourly DataFrames and calculating the means values for month: {month}."
+        )
         for j in hours_range(station):
             hour = month_df.query(f"Hour1_24 == {j}")
             mean = hour["Wind_direction"].mean()
@@ -79,14 +81,19 @@ def heat_map(df: pd.DataFrame, station: str):
     ax.set_ylabel("Mes", size=16)
     cbar = ax.collections[0].colorbar
     cbar.set_label("Dirección del viento (°)", size=16)
-    
+
+    fig.suptitle(
+        "Mapa de calor mensual de la dirección del viento (°) durante las horas de operación",
+        size=16,
+    )
+
     if station.upper() in ["MROC", "MRLB"]:
         plt.xticks(rotation=45)
 
     plt.yticks(rotation=0)
     plt.subplots_adjust(
         bottom=0.12,
-        top=0.94,
+        top=0.92,
         left=0.1,
         right=1.0,
     )
