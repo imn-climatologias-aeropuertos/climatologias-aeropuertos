@@ -21,6 +21,17 @@ def contour_map(
     axs = _axs.flatten()
     cmap = mpl.cm.rainbow
 
+    suptitle_varname = (
+        f"las {cbar_label.lower()}"
+        if "Ráfagas" in cbar_label
+        else f"la {cbar_label.lower()}"
+    )
+    fig.suptitle(
+        f"Distribución diaria de {suptitle_varname} por mes",
+        size=20,
+        y=0.99,
+    )
+
     hours = hours_range(station)
     if station == "mroc":
         hours_array = np.array([hours.index(x) + 1 for x in hours])
@@ -73,13 +84,13 @@ def contour_map(
         #     axs[i -1].set_ylabel("Hora", size=16)
         # else:
         #     axs[i - 1].set_yticklabels([])
-            
+
         axs[i - 1].set_yticklabels(local_time_list(hours))
-        axs[i -1].set_ylabel("Hora", size=16)
+        axs[i - 1].set_ylabel("Hora local", size=16)
 
         # set the title for every plot (the month name)
-        axs[i - 1].set_title(month, weight="bold", size=16)
-        axs[i -1].set_xlabel("Día", size=14)
+        axs[i - 1].set_title(month, size=15)
+        axs[i - 1].set_xlabel("Día del mes", size=14)
         # axs[i -1].set_ylabel("Hora", size=16)
 
     cbar_ax = fig.add_axes([0.85, 0.25, 0.02, 0.5])
@@ -99,7 +110,7 @@ def contour_map(
     cb.ax.tick_params(labelsize=18)
     fig.subplots_adjust(
         bottom=0.05,
-        top=0.97,
+        top=0.95,
         left=0.1,
         right=0.8,
         wspace=0.25,

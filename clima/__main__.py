@@ -98,7 +98,7 @@ def wind_speed(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Velocidad del viento (Kt)"
+    label = "Velocidad del viento (kt)"
 
     contour_map(
         df,
@@ -132,7 +132,7 @@ def wind_gust(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Ráfagas de viento (Kt)"
+    label = "Ráfagas de viento (kt)"
 
     contour_map(
         df,
