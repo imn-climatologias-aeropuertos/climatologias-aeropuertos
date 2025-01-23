@@ -30,6 +30,15 @@ def time_series(
 ):
     sns.set_theme()
     fig, _axs = plt.subplots(figsize=(16, 18), nrows=4, ncols=3)
+    suptitle = (
+        f"las {yaxis_label.lower()}"
+        if "Ráfagas" in yaxis_label
+        else f"la {yaxis_label.lower()}"
+    )
+    fig.suptitle(
+        f"Series de tiempo diarias para {suptitle} por mes",
+        size=18,
+    )
     axs = _axs.flatten()
 
     hours = hours_range(station)
@@ -115,7 +124,7 @@ def time_series(
 
     fig.subplots_adjust(
         bottom=0.05,
-        top=0.97,
+        top=0.93,
         left=0.08,
         right=0.95,
         wspace=0.2,
@@ -139,11 +148,27 @@ def single_time_series(df: pd.DataFrame, variable: str, yaxis_label="", save_as=
 
     sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
+    suptitle = (
+        f"las {yaxis_label.lower()}"
+        if "Ráfagas" in yaxis_label
+        else f"la {yaxis_label.lower()}"
+    )
+    fig.suptitle(
+        f"Serie de tiempo anual para {suptitle}",
+        size=18,
+    )
     im = sns.lineplot(x=range(12), y=month_means, ax=ax)
     im.set_xticks(list(range(12)))
     im.set_xticklabels([m[0:3].upper() for m in months])
     im.set_xlabel("Mes", size=16)
     im.set_ylabel(yaxis_label, size=16)
+
+    fig.subplots_adjust(
+        bottom=0.15,
+        top=0.92,
+        left=0.12,
+        right=0.95,
+    )
 
     logger.info(f"Saving single time series figure for variable {variable}.")
     fig.savefig(
@@ -152,7 +177,10 @@ def single_time_series(df: pd.DataFrame, variable: str, yaxis_label="", save_as=
         dpi=dpi,
     )
 
-def single_time_series_by_hour(df: pd.DataFrame, station: str, variable: str, yaxis_label="", save_as=""):
+
+def single_time_series_by_hour(
+    df: pd.DataFrame, station: str, variable: str, yaxis_label="", save_as=""
+):
 
     hours = hours_range(station)
     hours_length = len(hours)
@@ -169,17 +197,26 @@ def single_time_series_by_hour(df: pd.DataFrame, station: str, variable: str, ya
 
     sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
+    suptitle = (
+        f"las {yaxis_label.lower()}"
+        if "Ráfagas" in yaxis_label
+        else f"la {yaxis_label.lower()}"
+    )
+    fig.suptitle(
+        f"Serie de tiempo horaria para {suptitle}",
+        size=18,
+    )
     im = sns.lineplot(x=range(hours_length), y=hour_means, ax=ax)
     im.set_xticks(list(range(hours_length)))
     im.set_xticklabels(local_time_list(hours))
     im.set_xlabel("Hora", size=16)
     im.set_ylabel(yaxis_label, size=16)
-    
+
     if station.upper() in ["MROC", "MRLB"]:
         plt.xticks(rotation=45)
     fig.subplots_adjust(
         bottom=0.15,
-        top=0.97,
+        top=0.92,
         left=0.12,
         right=0.95,
     )
