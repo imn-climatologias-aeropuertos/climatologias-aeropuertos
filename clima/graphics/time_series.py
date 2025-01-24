@@ -30,11 +30,7 @@ def time_series(
 ):
     sns.set_theme()
     fig, _axs = plt.subplots(figsize=(16, 18), nrows=4, ncols=3)
-    suptitle = (
-        f"las {yaxis_label.lower()}"
-        if "Ráfagas" in yaxis_label
-        else f"la {yaxis_label.lower()}"
-    )
+    suptitle = f"las {yaxis_label}" if "Ráfagas" in yaxis_label else f"la {yaxis_label}"
     fig.suptitle(
         f"Series de tiempo diarias para {suptitle} por mes",
         size=18,
@@ -148,11 +144,7 @@ def single_time_series(df: pd.DataFrame, variable: str, yaxis_label="", save_as=
 
     sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
-    suptitle = (
-        f"las {yaxis_label.lower()}"
-        if "Ráfagas" in yaxis_label
-        else f"la {yaxis_label.lower()}"
-    )
+    suptitle = f"las {yaxis_label}" if "Ráfagas" in yaxis_label else f"la {yaxis_label}"
     fig.suptitle(
         f"Serie de tiempo anual para {suptitle}",
         size=18,
@@ -197,11 +189,7 @@ def single_time_series_by_hour(
 
     sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
-    suptitle = (
-        f"las {yaxis_label.lower()}"
-        if "Ráfagas" in yaxis_label
-        else f"la {yaxis_label.lower()}"
-    )
+    suptitle = f"las {yaxis_label}" if "Ráfagas" in yaxis_label else f"la {yaxis_label}"
     fig.suptitle(
         f"Serie de tiempo horaria para {suptitle}",
         size=18,

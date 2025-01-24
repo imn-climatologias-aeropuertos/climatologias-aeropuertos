@@ -63,7 +63,7 @@ def wind_direction(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Dirección del viento (°)"
+    label = "dirección del viento (°)"
 
     heat_map(df, station)
     contour_map(
@@ -98,7 +98,7 @@ def wind_speed(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Velocidad del viento (kt)"
+    label = "velocidad del viento (kt)"
 
     contour_map(
         df,
@@ -132,7 +132,7 @@ def wind_gust(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Ráfagas de viento (kt)"
+    label = "ráfagas de viento (kt)"
 
     contour_map(
         df,
@@ -167,7 +167,7 @@ def temperature(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Temperatura (°C)"
+    label = "temperatura (°C)"
 
     contour_map(
         df,
@@ -201,7 +201,7 @@ def dewpoint(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Temperatura del punto rocío (°C)"
+    label = "temperatura del punto rocío (°C)"
 
     contour_map(
         df,
@@ -235,7 +235,7 @@ def pressure(ctx):
     config = config[station][columns[-1].lower()]
 
     df = ctx.obj["data"][columns]
-    label = "Presión atmosférica (inHg)"
+    label = "presión atmosférica (inHg)"
 
     contour_map(
         df,
@@ -272,12 +272,12 @@ def visibility(ctx):
         df,
         station,
         "Visibility",
-        bp_label="Visibilidad < 5000.0 m",
+        bp_label="visibilidad < 5000.0 m",
         save_as="visibility",
     )
     bar_plot(df, station, "Cavok", save_as="cavok", bp_label="CAVOK")
     bar_plot(
-        df, station, "Visibility", save_as="visibility", bp_label="Visibilidad < 5000 m"
+        df, station, "Visibility", save_as="visibility", bp_label="visibilidad < 5000 m"
     )
 
 
@@ -299,7 +299,7 @@ def weather(ctx):
 
     df = ctx.obj["data"][columns]
 
-    shra_label = "Chubascos (SHRA)"
+    shra_label = "chubascos (SHRA)"
     barfrec_plot(
         df,
         station,
@@ -317,7 +317,7 @@ def weather(ctx):
         bp_label=shra_label,
     )
 
-    tsra_label = "Tormenta eléctrica (TS ó TSRA)"
+    tsra_label = "tormenta eléctrica (TS ó TSRA)"
     barfrec_plot(
         df,
         station,
@@ -335,7 +335,7 @@ def weather(ctx):
         bp_label=tsra_label,
     )
 
-    ra_label = "Lluvia (RA)"
+    ra_label = "lluvia (RA)"
     barfrec_plot(
         df,
         station,
@@ -353,7 +353,7 @@ def weather(ctx):
         bp_label=ra_label,
     )
 
-    dz_label = "Llovizna (DZ)"
+    dz_label = "llovizna (DZ)"
     barfrec_plot(
         df,
         station,
@@ -371,7 +371,7 @@ def weather(ctx):
         bp_label=dz_label,
     )
 
-    br_label = "Neblina (BR)"
+    br_label = "neblina (BR)"
     barfrec_plot(
         df,
         station,
@@ -389,7 +389,7 @@ def weather(ctx):
         bp_label=br_label,
     )
 
-    fg_label = "Niebla (FG)"
+    fg_label = "niebla (FG)"
     barfrec_plot(
         df,
         station,
@@ -428,14 +428,21 @@ def ceiling(ctx):
 
     df = ctx.obj["data"][columns]
 
+    label = "techo < 1500 ft"
     barfrec_plot(
         df,
         station,
         "Sky_layer_height",
-        bp_label="Techo < 1500 ft",
+        bp_label=label,
         save_as="ceiling",
     )
-    bar_plot(df, station, "Sky_layer_height", save_as="ceiling")
+    bar_plot(
+        df,
+        station,
+        "Sky_layer_height",
+        save_as="ceiling",
+        bp_label=label,
+    )
 
 
 if __name__ == "__main__":

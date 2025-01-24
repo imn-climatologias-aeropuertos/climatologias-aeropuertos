@@ -22,9 +22,7 @@ def contour_map(
     cmap = mpl.cm.rainbow
 
     suptitle_varname = (
-        f"las {cbar_label.lower()}"
-        if "Ráfagas" in cbar_label
-        else f"la {cbar_label.lower()}"
+        f"las {cbar_label}" if "Ráfagas" in cbar_label else f"la {cbar_label}"
     )
     fig.suptitle(
         f"Distribución diaria de {suptitle_varname} por mes",
