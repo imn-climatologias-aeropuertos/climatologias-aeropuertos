@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 import pandas as pd
 
 
@@ -5,11 +7,19 @@ def _days_of_month(max_days: int):
     return [f"{day}" for day in range(1, max_days + 1)]
 
 
+operation_hours_by_station: Dict[str, List[int]] = {
+    "mroc": [i for i in range(7, 25)] + [i for i in range(1, 7)],
+    "mrpv": [i for i in range(12, 25)],
+    "mrlm": [i for i in range(12, 25)],
+    "mrlb": [i for i in range(12, 25)] + [i for i in range(1, 7)],
+}
+
+
 def hours_range(station: str):
     hours = []
 
     if station == "mrlm" or station == "mrpv":
-        return [x for x in range(12, 25)]
+        return [i for i in range(12, 25)]
 
     if station == "mroc":
         for i in range(7, 12):

@@ -1,5 +1,6 @@
 import re
 
+from typing import List
 from decimal import ROUND_HALF_UP, Decimal
 
 import matplotlib.pyplot as plt
@@ -73,10 +74,12 @@ def barfrec_plot(
     weather="",
     bp_label="",
     save_as="",
+    add_suptitle=False,
 ):
     years = df["Year"].unique()
     months = np.arange(1, 13)
-    month_means = np.arange(12)
+    # month_means = np.arange(12)
+    month_means = np.empty([12], dtype=float)
     hrange = len(hours_range(station))
 
     logger.info(
@@ -106,9 +109,10 @@ def barfrec_plot(
                 else:
                     month_sum += _handle_weather(day_df, variable, weather)
 
-        month_means[month - 1] = Decimal(month_sum / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
+        # month_means[month - 1] = Decimal(month_sum / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        month_means[month - 1] = month_sum / len(years)
     frecs = 100 * month_means / len(DAYS_PER_MONTH[month])
 
     sns.set_theme()
@@ -152,12 +156,19 @@ def barfrec_plot(
 
     plt.subplots_adjust(
         bottom=0.1,
-        top=0.93,
+        top=0.97,
         left=0.1,
         right=0.9,
     )
 
-    ax.set_title(f"Distribución mensual de ocurrencias de {bp_label}", size=18)
+    if add_suptitle:
+        plt.subplots_adjust(
+            bottom=0.1,
+            top=0.93,
+            left=0.1,
+            right=0.9,
+        )
+        ax.set_title(f"Distribución mensual de ocurrencias de {bp_label}", size=18)
 
     logger.info(f"Saving bar-frecuencies plot figure for variable {variable}.")
     fig.savefig(
@@ -166,10 +177,17 @@ def barfrec_plot(
 
 
 def bar_plot(
-    df: pd.DataFrame, station: str, variable: str, bp_label="", weather="", save_as=""
+    df: pd.DataFrame,
+    station: str,
+    variable: str,
+    bp_label="",
+    weather="",
+    save_as="",
+    add_suptitle=False,
 ):
     hours = hours_range(station)
-    means = np.arange(len(hours))
+    # means = np.arange(len(hours))
+    means = np.empty([len(hours)], dtype=float)
     years = df["Year"].unique()
 
     logger.info(
@@ -178,20 +196,21 @@ def bar_plot(
     for hour in hours:
         index = hours.index(hour)
         hour_df = df.query(f"Hour1_24 == {hour}")
+        count = 0
 
         if variable == "Cavok":
-            mean = hour_df[variable].sum() / (12 * len(years))
+            count = hour_df[variable].sum()
         elif variable == "Visibility":
-            mean = np.count_nonzero(hour_df[variable] <= 5000.0) / (12 * len(years))
+            count = np.count_nonzero(hour_df[variable] <= 5000.0)
         elif variable in ["Weather_description", "Weather_obscuration"]:
             hour_df = hour_df.query('Weather_intensity != "VC"')
-            mean = np.count_nonzero(hour_df[variable] == weather) / (12 * len(years))
+            count = np.count_nonzero(hour_df[variable] == weather)
         elif variable == "Weather_precipitation":
             if weather == "RA":
                 hour_df = hour_df.query(
                     'Weather_description != "SH" and Weather_description != "TS"'
                 )
-            mean = np.count_nonzero(hour_df[variable] == weather) / (12 * len(years))
+            count = np.count_nonzero(hour_df[variable] == weather)
         elif "Sky_layer" in variable:
             cols = [
                 "Sky_layer1_height",
@@ -199,11 +218,12 @@ def bar_plot(
                 "Sky_layer3_height",
                 "Sky_layer4_height",
             ]
-            mean = np.count_nonzero(hour_df[cols] <= 1500.0) / (12 * len(years))
+            count = np.count_nonzero(hour_df[cols] <= 1500.0)
         else:
             raise ValueError(f"Invalid variable {variable}.")
 
-        means[index] = Decimal(mean).quantize(Decimal("1."), ROUND_HALF_UP)
+        # means[index] = Decimal(mean).quantize(Decimal("1."), ROUND_HALF_UP)
+        means[index] = count / (12 * len(years))
 
     sns.set_theme()
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -226,25 +246,40 @@ def bar_plot(
     )
     plt.subplots_adjust(
         bottom=0.15,
-        top=0.94,
+        top=0.97,
         left=0.1,
         right=0.95,
     )
 
-    ax.set_title(f"Distribución horaria de ocurrencias de {bp_label}", size=18)
+    if add_suptitle:
+        plt.subplots_adjust(
+            bottom=0.15,
+            top=0.94,
+            left=0.1,
+            right=0.95,
+        )
+        ax.set_title(f"Distribución horaria de ocurrencias de {bp_label}", size=18)
+
     fig.savefig(
         f"template/Figures/graphs/bar_plot_{save_as}.jpg", format="jpg", dpi=dpi
     )
 
 
-def all_weather_bar_plot(df: pd.DataFrame):
-    means_dz = np.arange(12)
-    means_ra = np.arange(12)
-    means_sh = np.arange(12)
-    means_ts = np.arange(12)
-    means_fg = np.arange(12)
-    means_br = np.arange(12)
+def all_weather_bar_plot(df: pd.DataFrame, add_suptitle=False):
+    # means_dz = np.arange(12)
+    # means_ra = np.arange(12)
+    # means_sh = np.arange(12)
+    # means_ts = np.arange(12)
+    # means_fg = np.arange(12)
+    # means_br = np.arange(12)
+    means_dz = np.empty([12], dtype=float)
+    means_ra = np.empty([12], dtype=float)
+    means_sh = np.empty([12], dtype=float)
+    means_ts = np.empty([12], dtype=float)
+    means_fg = np.empty([12], dtype=float)
+    means_br = np.empty([12], dtype=float)
     years = df["Year"].unique()
+    total_years = len(years)
 
     logger.info(f"Getting the monthly DataFrames for all-weather bar plot.")
     for i, month in enumerate(MONTHS):
@@ -272,25 +307,32 @@ def all_weather_bar_plot(df: pd.DataFrame):
                 means_obsc[0] += _handle_weather(day_df, "Weather_obscuration", "FG")
                 means_obsc[1] += _handle_weather(day_df, "Weather_obscuration", "BR")
 
-        means_dz[i] = Decimal(means_prec[0] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
-        means_ra[i] = Decimal(means_prec[1] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
-        means_sh[i] = Decimal(means_prec[2] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
-        means_ts[i] = Decimal(means_prec[3] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
+        # means_dz[i] = Decimal(means_prec[0] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        # means_ra[i] = Decimal(means_prec[1] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        # means_sh[i] = Decimal(means_prec[2] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        # means_ts[i] = Decimal(means_prec[3] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
 
-        means_fg[i] = Decimal(means_obsc[0] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
-        means_br[i] = Decimal(means_obsc[1] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
+        # means_fg[i] = Decimal(means_obsc[0] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        # means_br[i] = Decimal(means_obsc[1] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        means_dz[i] = means_prec[0] / total_years
+        means_ra[i] = means_prec[1] / total_years
+        means_sh[i] = means_prec[2] / total_years
+        means_ts[i] = means_prec[3] / total_years
+
+        means_fg[i] = means_obsc[0] / total_years
+        means_br[i] = means_obsc[1] / total_years
 
     months_abbr = [m[0:3].upper() for m in MONTHS]
     means_prec_per_month = []
@@ -333,10 +375,12 @@ def all_weather_bar_plot(df: pd.DataFrame):
     plt.xlabel("Mes", fontsize=16)
     plt.ylabel("Número de ocurrencias de precipitación", fontsize=16)
     plt.legend(framealpha=0.6)
-    plt.title(
-        "Distribución mensual de ocurrencias de fenómenos de precipitación",
-        size=18,
-    )
+
+    if add_suptitle:
+        plt.title(
+            "Distribución mensual de ocurrencias de fenómenos de precipitación",
+            size=18,
+        )
 
     logger.info(f"Saving bar plot figure for variable for all weather: precipitations.")
     plt.savefig(
@@ -360,10 +404,12 @@ def all_weather_bar_plot(df: pd.DataFrame):
     plt.xlabel("Mes", fontsize=16)
     plt.ylabel("Número de ocurrencias de niebla y neblina", fontsize=16)
     plt.legend(framealpha=0.6)
-    plt.title(
-        "Distribución mensual de ocurrencias de fenómenos de oscurecimiento",
-        size=18,
-    )
+
+    if add_suptitle:
+        plt.title(
+            "Distribución mensual de ocurrencias de fenómenos de oscurecimiento",
+            size=18,
+        )
 
     logger.info(f"Saving bar plot figure for variable for all weather: obscurations.")
     plt.savefig(
@@ -385,17 +431,22 @@ def _handle_gusts(df: pd.DataFrame, grange=(0, 20)):
     return 0
 
 
-def gusts_bar_plot(df: pd.DataFrame):
-    gust_19 = np.arange(12)
-    gust_29 = np.arange(12)
-    gust_39 = np.arange(12)
-    gust_40 = np.arange(12)
+def gusts_bar_plot(df: pd.DataFrame, add_suptitle=False):
+    # gust_19 = np.arange(12)
+    # gust_29 = np.arange(12)
+    # gust_39 = np.arange(12)
+    # gust_40 = np.arange(12)
+    gust_19 = np.empty([12], dtype=float)
+    gust_29 = np.empty([12], dtype=float)
+    gust_39 = np.empty([12], dtype=float)
+    gust_40 = np.empty([12], dtype=float)
     years = df["Year"].unique()
+    total_years = len(years)
 
     logger.info(f"Getting the monthly DataFrames for gusts bar plot.")
     for i, month in enumerate(MONTHS):
         month_df = df.query(f"Month == {i + 1}")
-        means = np.zeros(4)
+        means = np.zeros(4, dtype=int)
 
         logger.info(
             f"Getting the yearly DataFrames for gusts bar plot, month: {month}."
@@ -414,18 +465,22 @@ def gusts_bar_plot(df: pd.DataFrame):
                 means[2] += _handle_gusts(day_df, grange=(30, 40))
                 means[3] += _handle_gusts(day_df, grange=(40, 50))
 
-        gust_19[i] = Decimal(means[0] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
-        gust_29[i] = Decimal(means[1] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
-        gust_39[i] = Decimal(means[2] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
-        gust_40[i] = Decimal(means[3] / len(years)).quantize(
-            Decimal("1."), ROUND_HALF_UP
-        )
+        # gust_19[i] = Decimal(means[0] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        # gust_29[i] = Decimal(means[1] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        # gust_39[i] = Decimal(means[2] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        # gust_40[i] = Decimal(means[3] / len(years)).quantize(
+        #     Decimal("1."), ROUND_HALF_UP
+        # )
+        gust_19[i] = means[0] / total_years
+        gust_29[i] = means[1] / total_years
+        gust_39[i] = means[2] / total_years
+        gust_40[i] = means[3] / total_years
 
     months_abbr = [m[0:3].upper() for m in MONTHS]
     means_gust_per_month = []
@@ -458,10 +513,12 @@ def gusts_bar_plot(df: pd.DataFrame):
     plt.xlabel("Mes", fontsize=16)
     plt.ylabel("No. de ocurrencias de ráfagas de viento (kt)", fontsize=16)
     plt.legend(framealpha=0.6)
-    plt.title(
-        "Distribución mensual de ocurrencias de ráfagas de viento (kt)",
-        size=18,
-    )
+
+    if add_suptitle:
+        plt.title(
+            "Distribución mensual de ocurrencias de ráfagas de viento (kt)",
+            size=18,
+        )
 
     logger.info(f"Saving bar plot figure for variable for gusts.")
     plt.savefig(

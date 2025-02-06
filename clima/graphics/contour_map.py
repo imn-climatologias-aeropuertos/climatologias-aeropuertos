@@ -16,19 +16,11 @@ def contour_map(
     cbar_label="",
     save_as="",
     config={"max": 100, "min": 0, "ticks_num": 9},
+    add_suptitle=False,
 ):
     fig, _axs = plt.subplots(figsize=(16, 18), nrows=4, ncols=3)
     axs = _axs.flatten()
     cmap = mpl.cm.rainbow
-
-    suptitle_varname = (
-        f"las {cbar_label}" if "Ráfagas" in cbar_label else f"la {cbar_label}"
-    )
-    fig.suptitle(
-        f"Distribución diaria de {suptitle_varname} por mes",
-        size=20,
-        y=0.99,
-    )
 
     hours = hours_range(station)
     if station == "mroc":
@@ -108,12 +100,30 @@ def contour_map(
     cb.ax.tick_params(labelsize=18)
     fig.subplots_adjust(
         bottom=0.05,
-        top=0.95,
+        top=0.97,
         left=0.1,
         right=0.8,
         wspace=0.25,
         hspace=0.25,
     )
+
+    if add_suptitle:
+        fig.subplots_adjust(
+            bottom=0.05,
+            top=0.95,
+            left=0.1,
+            right=0.8,
+            wspace=0.25,
+            hspace=0.25,
+        )
+        suptitle_varname = (
+            f"las {cbar_label}" if "Ráfagas" in cbar_label else f"la {cbar_label}"
+        )
+        fig.suptitle(
+            f"Distribución diaria de {suptitle_varname} por mes",
+            size=20,
+            y=0.99,
+        )
 
     logger.info(f"Saving contour map figure for variable {variable}.")
     fig.savefig(

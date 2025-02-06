@@ -31,7 +31,7 @@ def _cardinal_point(value: float):
         raise ValueError("Not valid value.")
 
 
-def heat_map(df: pd.DataFrame, station: str):
+def heat_map(df: pd.DataFrame, station: str, add_suptitle=False):
 
     means_per_month = []
     cardinal_points_per_month = []
@@ -77,15 +77,10 @@ def heat_map(df: pd.DataFrame, station: str):
         yticklabels=months,
         xticklabels=hours_labels,
     )
-    ax.set_xlabel("Hora", size=16)
+    ax.set_xlabel("Hora local", size=16)
     ax.set_ylabel("Mes", size=16)
     cbar = ax.collections[0].colorbar
     cbar.set_label("Dirección del viento (°)", size=16)
-
-    fig.suptitle(
-        "Mapa de calor mensual de la dirección del viento (°) durante las horas de operación",
-        size=16,
-    )
 
     if station.upper() in ["MROC", "MRLB"]:
         plt.xticks(rotation=45)
@@ -93,10 +88,22 @@ def heat_map(df: pd.DataFrame, station: str):
     plt.yticks(rotation=0)
     plt.subplots_adjust(
         bottom=0.12,
-        top=0.92,
+        top=0.96,
         left=0.1,
         right=1.0,
     )
+
+    if add_suptitle:
+        plt.subplots_adjust(
+            bottom=0.12,
+            top=0.92,
+            left=0.1,
+            right=1.0,
+        )
+        fig.suptitle(
+            "Mapa de calor mensual de la dirección del viento (°) durante las horas de operación",
+            size=16,
+        )
 
     logger.info(f"Saving heat map figure for wind direction.")
     fig.savefig(f"template/Figures/graphs/heatmap_wind_dir.jpg", format="jpg", dpi=dpi)

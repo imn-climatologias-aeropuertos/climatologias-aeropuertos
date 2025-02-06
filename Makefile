@@ -5,6 +5,9 @@ TEST_FILES=$(shell find . -path "./test/*.py")
 SOURCES_FOLDER=clima
 TESTS_FOLDER=test
 
+CLIMA=python -m clima
+ADD_SUPTITLE=false
+
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 
 check_no_main:
@@ -41,34 +44,43 @@ lint:
 tests:
 	PYTHONPATH=. $(POETRY_RUN) pytest -vv test
 
-run-all: resume-table wind-dir wind-spd wind-gust temp dewpt press vis weather ceiling
+check_if_add_suptitle:
+ifeq ($(ADD_SUPTITLE),true)
+	@echo Adding SUPTITLE to visualizations
+CLIMA_RUN:=$(CLIMA) --add-suptitle
+else
+	@echo SUPTITLE no will be added to visualizations
+CLIMA_RUN:=$(CLIMA)
+endif
 
-resume-table:
-	python -m clima $(STATION) resume-table
+run-all: check_if_add_suptitle resume-table wind-dir wind-spd wind-gust temp dewpt press vis weather ceiling
 
-wind-dir:
-	python -m clima $(STATION) wind-direction
+resume-table: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) resume-table
 
-wind-spd:
-	python -m clima $(STATION) wind-speed
+wind-dir: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) wind-direction
 
-wind-gust:
-	python -m clima $(STATION) wind-gust
+wind-spd: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) wind-speed
 
-temp:
-	python -m clima $(STATION) temperature
+wind-gust: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) wind-gust
 
-dewpt:
-	python -m clima $(STATION) dewpoint
+temp: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) temperature
 
-press:
-	python -m clima $(STATION) pressure
+dewpt: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) dewpoint
 
-vis:
-	python -m clima $(STATION) visibility
+press: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) pressure
 
-weather:
-	python -m clima $(STATION) weather
+vis: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) visibility
 
-ceiling:
-	python -m clima $(STATION) ceiling
+weather: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) weather
+
+ceiling: check_if_add_suptitle
+	$(CLIMA_RUN) $(STATION) ceiling
