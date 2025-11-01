@@ -118,7 +118,7 @@ def time_series(
 
     fig.subplots_adjust(
         bottom=0.05,
-        top=0.96,
+        top=0.97,
         left=0.08,
         right=0.95,
         wspace=0.2,
@@ -171,7 +171,7 @@ def single_time_series(
 
     fig.subplots_adjust(
         bottom=0.15,
-        top=0.96,
+        top=0.97,
         left=0.12,
         right=0.95,
     )
@@ -211,10 +211,10 @@ def single_time_series_by_hour(
     hours = hours_range(station)
     hours_length = len(hours)
     hour_means = np.zeros(hours_length, dtype=float)
-    if station == "mroc":
-        hours_array = np.array([hours.index(x) + 1 for x in hours])
-    else:
-        hours_array = np.array([hours.index(x) + 6 for x in hours])
+    # if station == "mroc":
+    #     hours_array = np.array([hours.index(x) + 1 for x in hours])
+    # else:
+    #     hours_array = np.array([hours.index(x) + 6 for x in hours])
 
     logger.info(f"Extracting data for single time series (hourly) for {variable}.")
     for i in range(hours_length):
@@ -234,7 +234,7 @@ def single_time_series_by_hour(
         plt.xticks(rotation=45)
     fig.subplots_adjust(
         bottom=0.15,
-        top=0.92,
+        top=0.97,
         left=0.12,
         right=0.95,
     )
@@ -242,7 +242,7 @@ def single_time_series_by_hour(
     if add_suptitle:
         fig.subplots_adjust(
             bottom=0.15,
-            top=0.96,
+            top=0.92,
             left=0.12,
             right=0.95,
         )
